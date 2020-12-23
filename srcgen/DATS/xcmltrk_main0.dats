@@ -35,8 +35,14 @@ STDIO =
 #staload "./../SATS/xcmltrk.sats"
 //
 (* ****** ****** *)
+implement
+the_XATSHOME_get() =
+$GLO.the_XATSHOME_get((*void*))
+(* ****** ****** *)
 
 local
+
+(* ****** ****** *)
 
 in(*in-of-local*)
 

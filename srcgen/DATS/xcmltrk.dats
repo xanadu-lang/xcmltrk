@@ -11,9 +11,11 @@
 UN = "prelude/SATS/unsafe.sats"
 //
 (* ****** ****** *)
-
-#staload "./../SATS/xcmltrk.sats"
-
+#staload
+"./../SATS/xcmltrk.sats"
+(* ****** ****** *)
+#dynload
+"./../DATS/xcmltrk_main0.dats"
 (* ****** ****** *)
 //
 implement
