@@ -7,5 +7,16 @@ effects in XCMDTRK and beyond
 *)
 //
 (* ****** ****** *)
+//
+fun
+the_XATSHOME_get((*void*)): string
+//
+(* ****** ****** *)
+//
+fun
+xcmltrk_main0
+{n:int | n >= 1}(int(n), !argv(n)): void
+//
+(* ****** ****** *)
 
 (* end of [xats_xcmltrk.sats] *)
