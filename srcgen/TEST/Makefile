@@ -8,8 +8,7 @@ CPF=cp -f
 RMF=rm -f
 ECHO=echo
 ######
-XATSOPT=\
-"$(XATSHOME)/bin/xatsopt"
+XCMLTRK=$(XCMLTRKD)/bin/xcmltrk
 ######
 all:: \
 test-2021-01-05
@@ -18,7 +17,7 @@ testall:: all
 testall:: cleanall
 ######
 test-2021-01-05: ; \
-$(XATSOPT) \
+$(XCMLTRK) \
 -d test-2021-01-15.dats
 ######
 clean:: ; $(RMF) *~
@@ -26,7 +25,8 @@ clean:: ; $(RMF) *~
 cleanall:: clean
 cleanall:: ; $(RMF) output
 ######
-export XATSOPTD="./../../xatsopt"
+export XCMLTRKD="./../.."
+export XATSHOME=${XCMLTRKD}/xatsopt
 ######
 
 ###### end of [Makefile] ######
