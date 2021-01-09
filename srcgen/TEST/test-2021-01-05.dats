@@ -1,7 +1,6 @@
 (* ****** ****** *)
 #include
-"share\
-/xatsopt_prelude.hats"
+"share/xatsopt_prelude.hats"
 (* ****** ****** *)
 
 fun
