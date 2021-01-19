@@ -256,14 +256,13 @@ xlambda(e)
 
 implement
 xlambda_h0dclist(dcls, e) =
-case dcls of
-| list_cons(dcl, dcls) =>
-  let
-  val e = xlambda(dcl, e)
-  in
-  xlambda(dcls, e)
-  end
-| list_nil() => e
+list_foldright<h0dcl><l0exp>(dcls, e)
+where
+{
+implement
+list_foldright$fopr<h0dcl><l0exp>(dcl, e) =
+xlambda(dcl, e)
+}
 
 (* ****** ****** *)
 

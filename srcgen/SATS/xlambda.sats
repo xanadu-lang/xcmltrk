@@ -65,7 +65,6 @@ l0exp =
 | L0Elam_hfarg of (hfarglst, l0exp) // pattern lambda
 | L0Elam_hdcst of (hdcstlst, l0exp) // hfundecl lambda
 | L0Elam_hdvar of (hdvarlst, l0exp) // hvardecl lambda
-| L0Elam_hclau of (h0claulst, l0exp)// case lambda
 //
 (* TODO: L0Etry0 *)
 //
@@ -86,6 +85,8 @@ l0exp =
 //
 | L0Enone0 of ()
 | L0Enone1 of (dataptr)
+//
+| L0Ehalt of ()
 
 and lfundecl = 
 LFUNDECL of

@@ -22,6 +22,33 @@ XATSOPT_targetloc
 (* ****** ****** *)
 
 implement
+fprint_val<hfarg> = fprint_hfarg
+
+implement
+fprint_val<hdcst> = fprint_hdcst
+
+implement
+fprint_val<hdvar> = fprint_hdvar
+
+(* ****** ****** *)
+
+implement
+fprint_val<lfundecl> = fprint_lfundecl
+
+implement
+fprint_val<l0clau> = fprint_l0clau
+
+implement
+fprint_val<l0gpat>(fp, gpat) =
+fprint!(fp, gpat)
+
+implement
+fprint_val<l0gua>(fp, gua) =
+fprint!(fp, gua)
+
+(* ****** ****** *)
+
+implement
 print_l0exp(e) =
 fprint!(stdout_ref, e)
 
@@ -110,8 +137,6 @@ case e of
   fprint!(fp, "L0Elam_hdcst(", hdc, ", ", e, ")")
 | L0Elam_hdvar(hdv, e) =>
   fprint!(fp, "L0Elam_hdvar(", hdv, ", ", e, ")")
-| L0Elam_hclau(clau, e) =>
-  fprint!(fp, "L0Elam_hclau(", clau, ", ", e, ")")
 //
 (* TODO: L0Etry0 *)
 //
@@ -142,6 +167,9 @@ case e of
   fprint!(fp, "L0Enone0()")
 | L0Enone1(p) =>
   fprint!(fp, "L0Enone1(", p, ")")
+//
+| L0Ehalt() =>
+  fprint!(fp, "L0Ehalt()")
 
 (* ****** ****** *)
 
@@ -154,19 +182,24 @@ prerr_lfundecl(fdcl) =
 fprint!(stderr_ref, fdcl)
 
 implement
-fprint_val<lfundecl>(fp, fdcl) =
-fprint!(fp, fdcl)
-
-implement
 fprint_lfundecl(fp, fdcl) =
 let
 val LFUNDECL(fdcl) = fdcl
 in
-fprint!(fp
-, "LFUNDECL("
-, "nam=", fdcl.nam, ", "
-, "hag=", fdcl.hag, ", "
-, "def=", fdcl.def, ")")
+case fdcl.hag of
+| Some(fdcl_hag) =>
+  fprint!
+  ( fp
+  , "LFUNDECL@{"
+  , "nam=", fdcl.nam, ", "
+  , "hag=", fdcl_hag, ", "
+  , "def=", fdcl.def, "}")
+| None() =>
+  fprint!
+  ( fp
+  , "LFUNDECL@{"
+  , "nam=", fdcl.nam, ", "
+  , "def=", fdcl.def, "}")
 end
 
 (* ****** ****** *)
@@ -178,10 +211,6 @@ fprint!(stdout_ref, clau)
 implement
 prerr_l0clau(clau) =
 fprint!(stderr_ref, clau)
-
-implement
-fprint_val<l0clau>(fp, clau) =
-fprint!(fp, clau)
 
 implement
 fprint_l0clau(fp, clau) =
@@ -202,10 +231,6 @@ prerr_l0gpat(gpat) =
 fprint!(stderr_ref, gpat)
 
 implement
-fprint_val<l0gpat>(fp, gpat) =
-fprint!(fp, gpat)
-
-implement
 fprint_l0gpat(fp, gpat) =
 case gpat of
 | L0GPATpat(pat) =>
@@ -222,10 +247,6 @@ fprint!(stdout_ref, gua)
 implement
 prerr_l0gua(gua) =
 fprint!(stderr_ref, gua)
-
-implement
-fprint_val<l0gua>(fp, gua) =
-fprint!(fp, gua)
 
 implement
 fprint_l0gua(fp, gua) =

@@ -749,7 +749,7 @@ case+dcls_opt of
   let
   (* NOTE: lambda conversion with xlambda *)
   (* TODO: cps conversion with xcps *)
-  val xlams = xlambda(dcls, L0Enone0())
+  val xlams = xlambda(dcls, L0Ehalt())
   val () = list_foreach<h0dcl>(dcls)
   val () = println!()
   val () = println!(xlams)
