@@ -40,9 +40,12 @@ LIBGC=-lgc
 
 SRCSATS := \
 xcmltrk.sats \
+xlambda.sats \
 
 SRCDATS := \
 xcmltrk_main0.dats \
+xlambda.dats \
+xlambda_print.dats \
 
 ######
 

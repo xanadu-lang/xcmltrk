@@ -15,7 +15,7 @@ the_XATSHOME_get((*void*)): string
 //
 fun
 xcmltrk_main0
-{n:int | n >= 1}(int(n), !argv(n)): void
+{n:int | n >= 2}(int(n), !argv(n)): void
 //
 (* ****** ****** *)
 

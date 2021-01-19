@@ -1,0 +1,236 @@
+//
+#include
+"share/atspre_staload.hats"
+#staload
+UN="prelude/SATS/unsafe.sats"
+//
+#define
+XATSOPT_targetloc
+"./../../xatsopt/srcgen/xats"
+//
+#include
+"./../HATS/libxcmltrk.hats"
+#staload $XATSOPT(*open-it*)
+//
+#staload $LOC
+#staload $LEX
+#staload $LAB
+#staload $INTREP0
+//
+#staload "./../SATS/xlambda.sats"
+//
+(* ****** ****** *)
+
+implement
+print_l0exp(e) =
+fprint!(stdout_ref, e)
+
+implement
+prerr_l0exp(e) =
+fprint!(stderr_ref, e)
+
+implement
+fprint_val<l0exp>(fp, e) =
+fprint!(fp, e)
+
+implement
+fprint_l0exp(fp, e) =
+case e of
+//
+| L0Ei00(x) =>
+  fprint!(fp, "L0Ei00(", x, ")")
+| L0Eb00(x) =>
+  fprint!(fp, "L0Eb00(", x, ")")
+| L0Es00(x) =>
+  fprint!(fp, "L0Es00(", x, ")")
+//
+| L0Eint(t) =>
+  fprint!(fp, "L0Eint(", t, ")")
+| L0Ebtf(t) =>
+  fprint!(fp, "L0Ebtf(", t, ")")
+| L0Echr(t) =>
+  fprint!(fp, "L0Echr(", t, ")")
+| L0Eflt(t) =>
+  fprint!(fp, "L0Eflt(", t, ")")
+| L0Estr(t) =>
+  fprint!(fp, "L0Estr(", t, ")")
+//
+| L0Etop(t) =>
+  fprint!(fp, "L0Etop(", t, ")")
+//
+| L0Evar(v) =>
+  fprint!(fp, "L0Evar(", v, ")")
+| L0Evknd(i, v) =>
+  fprint!(fp, "L0Evknd(", i, ", ", v, ")")
+//
+| L0Efcon(con) =>
+  fprint!(fp, "L0Efcon(", con, ")")
+| L0Etcon(con, ti) =>
+  fprint!(fp, "L0Etcon(", con, ", ", ti, ")")
+//
+| L0Efcst(cst) =>
+  fprint!(fp, "L0Efcst(", cst, ")")
+| L0Etcst(cst, ti) =>
+  fprint!(fp, "L0Efcst(", cst, ", ", ti, ")")
+//
+(* TODO: L0Etimp *)
+//
+| L0Edapp(e1, es) =>
+  fprint!(fp, "L0Edapp(", e1, ", ", es, ")")
+//
+| L0Epcon(e, l) =>
+  fprint!(fp, "L0Epcon(", e, ", ", l, ")")
+| L0Epbox(e, l, i) =>
+  fprint!(fp, "L0Epbox(", e, ", ", l, ", ", i, ")")
+//
+| L0Eproj(e, l, i) =>
+  fprint!(fp, "L0Eproj(", e, ", ", l, ", ", i, ")")
+| L0Eplft(e, l, i) =>
+  fprint!(fp, "L0Eplft(", e, ", ", l, ", ", i, ")")
+| L0Epptr(e, l, i) =>
+  fprint!(fp, "L0Epptr(", e, ", ", l, ", ", i, ")")
+//
+| L0Etuple(knd, npf, es) =>
+  fprint!(fp, "L0Etype(", knd, ", ", npf, ", ", es, ")")
+//
+| L0Eassgn(e1, e2) =>
+  fprint!(fp, "L0Eassgn(", e1, ", ", e2, ")")
+//
+| L0Eif0(e1, e2, e3) =>
+  fprint!(fp, "L0Eif0(", e1, ", ", e2, ", ", e3, ")")
+//
+| L0Ecase(i, e, clau) =>
+  fprint!(fp, "L0Ecase(", i, ", ", e, ", ", clau, ")")
+//
+| L0Efix(fdcls) =>
+  fprint!(fp, "L0Efix(", fdcls, ")")
+| L0Elam_hfarg(hag, e) =>
+  fprint!(fp, "L0Elam_hfarg(", hag, ", ", e, ")")
+| L0Elam_hdcst(hdc, e) =>
+  fprint!(fp, "L0Elam_hdcst(", hdc, ", ", e, ")")
+| L0Elam_hdvar(hdv, e) =>
+  fprint!(fp, "L0Elam_hdvar(", hdv, ", ", e, ")")
+| L0Elam_hclau(clau, e) =>
+  fprint!(fp, "L0Elam_hclau(", clau, ", ", e, ")")
+//
+(* TODO: L0Etry0 *)
+//
+| L0Eaddr(e) =>
+  fprint!(fp, "L0Eaddr(", e, ")")
+| L0Eflat(e) =>
+  fprint!(fp, "L0Eflat(", e, ")")
+| L0Etalf(e) =>
+  fprint!(fp, "L0Etalf(", e, ")")
+//
+| L0Efold(e) =>
+  fprint!(fp, "L0Efold(", e, ")")
+//
+| L0Eeval(i, e) =>
+  fprint!(fp, "L0Eeval(", i, ", ", e, ")")
+//
+| L0Efree(i, e) =>
+  fprint!(fp, "L0Efree(", i, ", ", e, ")")
+//
+(* TODO: L0Eraise *)
+//
+| L0Elazy(e) =>
+  fprint!(fp, "L0Elazy(", e, ")")
+| L0Ellazy(e, es) =>
+  fprint!(fp, "L0Ellazy(", e, ", ", es, ")")
+//
+| L0Enone0() =>
+  fprint!(fp, "L0Enone0()")
+| L0Enone1(p) =>
+  fprint!(fp, "L0Enone1(", p, ")")
+
+(* ****** ****** *)
+
+implement
+print_lfundecl(fdcl) =
+fprint!(stdout_ref, fdcl)
+
+implement
+prerr_lfundecl(fdcl) =
+fprint!(stderr_ref, fdcl)
+
+implement
+fprint_val<lfundecl>(fp, fdcl) =
+fprint!(fp, fdcl)
+
+implement
+fprint_lfundecl(fp, fdcl) =
+let
+val LFUNDECL(fdcl) = fdcl
+in
+fprint!(fp
+, "LFUNDECL("
+, "nam=", fdcl.nam, ", "
+, "hag=", fdcl.hag, ", "
+, "def=", fdcl.def, ")")
+end
+
+(* ****** ****** *)
+
+implement
+print_l0clau(clau) =
+fprint!(stdout_ref, clau)
+
+implement
+prerr_l0clau(clau) =
+fprint!(stderr_ref, clau)
+
+implement
+fprint_val<l0clau>(fp, clau) =
+fprint!(fp, clau)
+
+implement
+fprint_l0clau(fp, clau) =
+case clau of
+| L0CLAUpat(gpat) =>
+  fprint!(fp, "L0CLAUpat(", gpat, ")")
+| L0CLAUexp(gpat, e) =>
+  fprint!(fp, "L0CLAUexp(", gpat, ", ", e, ")")
+
+(* ****** ****** *)
+
+implement
+print_l0gpat(gpat) =
+fprint!(stdout_ref, gpat)
+
+implement
+prerr_l0gpat(gpat) =
+fprint!(stderr_ref, gpat)
+
+implement
+fprint_val<l0gpat>(fp, gpat) =
+fprint!(fp, gpat)
+
+implement
+fprint_l0gpat(fp, gpat) =
+case gpat of
+| L0GPATpat(pat) =>
+  fprint!(fp, "L0GPATpat(", pat, ")")
+| L0GPATgua(pat, gua) =>
+  fprint!(fp, "L0GPATgua(", pat, ", ", gua, ")")
+
+(* ****** ****** *)
+
+implement
+print_l0gua(gua) =
+fprint!(stdout_ref, gua)
+
+implement
+prerr_l0gua(gua) =
+fprint!(stderr_ref, gua)
+
+implement
+fprint_val<l0gua>(fp, gua) =
+fprint!(fp, gua)
+
+implement
+fprint_l0gua(fp, gua) =
+case gua of
+| L0GUAexp(e) =>
+  fprint!(fp, "L0GUAexp(", e, ")")
+| L0GUAmat(e, pat) =>
+  fprint!(fp, "L0GUAmat(", e, ", ", pat, ")")
