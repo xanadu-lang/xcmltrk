@@ -40,8 +40,15 @@ STDIO =
 #staload "./../DATS/xlambda.dats"
 #staload "./../DATS/xlambda_print.dats"
 //
+#staload "./../SATS/xcps.sats"
+#staload "./../DATS/xcps.dats"
+#staload "./../DATS/xcps_print.dats"
+//
 #dynload "./../DATS/xlambda.dats"
 #dynload "./../DATS/xlambda_print.dats"
+//
+#dynload "./../DATS/xcps.dats"
+#dynload "./../DATS/xcps_print.dats"
 //
 (* ****** ****** *)
 implement
@@ -749,10 +756,13 @@ case+dcls_opt of
   let
   (* NOTE: lambda conversion with xlambda *)
   (* TODO: cps conversion with xcps *)
-  val xlams = xlambda(dcls, L0Ehalt())
+  val xlams = xlambda(dcls, L0Enone0())
+  val xcps = xcps(xlams, lam(x) =<cloref1> C0Ehalt())
   val () = list_foreach<h0dcl>(dcls)
   val () = println!()
   val () = println!(xlams)
+  val () = println!()
+  val () = println!(xcps)
   in
   end
   where 

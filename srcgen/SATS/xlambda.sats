@@ -85,8 +85,6 @@ l0exp =
 //
 | L0Enone0 of ()
 | L0Enone1 of (dataptr)
-//
-| L0Ehalt of ()
 
 and lfundecl = 
 LFUNDECL of
