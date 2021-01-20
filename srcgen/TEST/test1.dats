@@ -1,9 +1,5 @@
-#staload
-"prelude/DATS/gint.dats"
-#staload
-"prelude/DATS/bool.dats"
-#staload
-"prelude/DATS/list.dats"
+#include
+"share/xatsopt_prelude.hats"
 
 #extern
 fun foo: int
@@ -16,29 +12,6 @@ implement
 foo = 1
 }
 
-fun 
-f2() = 
-let
-val x
-var y = 1
-val () = y := 2
-in
-foo
-end
-where
-{
-implement
-foo = 2
-}
-
-fun
-main0() = 
-let
-val x1 = f1()
-val x2 = f2()
-in
-end
- 
 (* fun *)
 (* count1{a:type}( ls: list(a) ): int = *)
 (* let *)

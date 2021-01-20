@@ -18,7 +18,11 @@ testall:: cleanall
 ######
 test-2021-01-05: ; \
 $(XCMLTRK) \
--d test-2021-01-15.dats
+-d test-2021-01-05.dats
+######
+test1: ; \
+$(XCMLTRK) \
+-d test1.dats
 ######
 clean:: ; $(RMF) *~
 ######
@@ -26,7 +30,6 @@ cleanall:: clean
 cleanall:: ; $(RMF) output
 ######
 export XCMLTRKD="./../.."
-export XATSHOME=${XCMLTRKD}/xatsopt
 ######
 
 ###### end of [Makefile] ######

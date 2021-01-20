@@ -153,9 +153,9 @@ case e of
 | C0Eret(c, v) =>
   fprint!(fp, "C0Eret(", c, ", ", v, ")")
 | C0Edapp(f, arg, k) =>
-  fprint!(fp, "C0Edapp(", f, ", ", arg, ", ", k, ")")
+  fprint!(fp, "C0Edapp(", f, ", [", arg, "], ", k, ")")
 | C0Eprimop(prim, arg, k) =>
-  fprint!(fp, "C0Eprimop(", prim, ", ", arg, ", ", k, ")")
+  fprint!(fp, "C0Eprimop(", prim, ", [", arg, "], ", k, ")")
 | C0Ehalt() =>
   fprint!(fp, "C0Ehalt()")
 
