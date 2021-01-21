@@ -45,10 +45,10 @@ xcps.sats \
 
 SRCDATS := \
 xcmltrk_main0.dats \
-xlambda.dats \
-xlambda_print.dats \
-xcps.dats \
-xcps_print.dats \
+qcfu/xlambda.dats \
+qcfu/xlambda_print.dats \
+qcfu/xcps.dats \
+qcfu/xcps_print.dats \
 
 ######
 

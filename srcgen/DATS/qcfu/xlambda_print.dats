@@ -9,7 +9,7 @@ XATSOPT_targetloc
 "./../../xatsopt/srcgen/xats"
 //
 #include
-"./../HATS/libxcmltrk.hats"
+"./../../HATS/libxcmltrk.hats"
 #staload $XATSOPT(*open-it*)
 //
 #staload $LOC
@@ -17,7 +17,7 @@ XATSOPT_targetloc
 #staload $LAB
 #staload $INTREP0
 //
-#staload "./../SATS/xlambda.sats"
+#staload "./../../SATS/xlambda.sats"
 //
 (* ****** ****** *)
 

@@ -37,18 +37,19 @@ STDIO =
 #staload $INTREP0
 //
 #staload "./../SATS/xlambda.sats"
-#staload "./../DATS/xlambda.dats"
-#staload "./../DATS/xlambda_print.dats"
-//
 #staload "./../SATS/xcps.sats"
-#staload "./../DATS/xcps.dats"
-#staload "./../DATS/xcps_print.dats"
 //
-#dynload "./../DATS/xlambda.dats"
-#dynload "./../DATS/xlambda_print.dats"
+#staload "./../DATS/qcfu/xlambda.dats"
+#staload "./../DATS/qcfu/xlambda_print.dats"
 //
-#dynload "./../DATS/xcps.dats"
-#dynload "./../DATS/xcps_print.dats"
+#staload "./../DATS/qcfu/xcps.dats"
+#staload "./../DATS/qcfu/xcps_print.dats"
+//
+#dynload "./../DATS/qcfu/xlambda.dats"
+#dynload "./../DATS/qcfu/xlambda_print.dats"
+//
+#dynload "./../DATS/qcfu/xcps.dats"
+#dynload "./../DATS/qcfu/xcps_print.dats"
 //
 (* ****** ****** *)
 implement

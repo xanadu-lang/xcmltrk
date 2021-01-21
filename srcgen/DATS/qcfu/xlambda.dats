@@ -5,14 +5,14 @@
 UN="prelude/SATS/unsafe.sats"
 //
 #include
-"./../HATS/libxcmltrk.hats"
+"./../../HATS/libxcmltrk.hats"
 #staload $XATSOPT(*open-it*)
 //
 #staload $LOC
 #staload $LEX
 #staload $INTREP0
 //
-#staload "./../SATS/xlambda.sats"
+#staload "./../../SATS/xlambda.sats"
 //
 (* ****** ****** *)
 
