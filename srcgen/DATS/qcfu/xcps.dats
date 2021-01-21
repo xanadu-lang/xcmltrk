@@ -111,8 +111,6 @@ case e of
 | L0Efcst(hc) => c(C0Vfcst(hc))
 | L0Etcst(hc, ht) => c(C0Vtcst(hc, ht))
 //
-(* TODO: L0timp *)
-//
 | L0Edapp(e, es) =>
   let
   val x = fresh_hdvar("x")
@@ -256,7 +254,8 @@ case e of
   //
   val x = fresh_hdvar("x")
   val y = fresh_hdvar("y")
-  val xbod = list_vt2t(list_make_sing<c0val>(C0Vvar(x)))
+  val xbod = 
+  list_vt2t(list_make_sing<c0val>(C0Vvar(x)))
   val ybod = C0Vvar(y)
   //
   val cs = xcps(cs, lam(f) =<cloref1> 
@@ -301,7 +300,32 @@ case e of
   c(C0Vlam_hdvar(a, k, bod))
   end
 //
-(* TODO: L0Etry0 *)
+| L0Etry0(t, e, cs) =>
+  xcps(e, lam(e) =<cloref1>
+  let
+  val e =
+  list_vt2t(list_make_sing<c0val>(e))
+  //
+  val x = fresh_hdvar("x")
+  val y = fresh_hdvar("y")
+  val xbod = 
+  list_vt2t(list_make_sing<c0val>(C0Vvar(x)))
+  val ybod = C0Vvar(y)
+  //
+  val cs = xcps(cs, lam(f) =<cloref1> 
+  C0Edapp(f, xbod, C0NT(y, c(ybod))))
+  val k = C0NT(y, c(ybod))
+  val ks = 
+  list_vt2t(list_map<c0exp><c0nt>(cs))
+  where
+  {
+  implement
+  list_map$fopr<c0exp><c0nt>(bod) =
+  C0NT(x, bod)
+  }
+  in
+  C0Eprimop(C0Ptry0(t), e, list_cons(k, ks))
+  end)
 //
 | L0Eaddr(e) =>
   xcps(e, lam(e) =<cloref1>
@@ -391,7 +415,20 @@ case e of
   C0Eprimop(C0Pfree(i), e, k)
   end)
 //
-(* TODO: L0Eraise *)
+| L0Eraise(e) =>
+  xcps(e, lam(e) =<cloref1>
+  let 
+  val x = fresh_hdvar("x")
+  val xbod = C0Vvar(x)
+  val k = C0NT(x, c(xbod))
+  val k =
+  list_vt2t(list_make_sing<c0nt>(k))
+  //
+  val e =
+  list_vt2t(list_make_sing<c0val>(e))
+  in
+  C0Eprimop(C0Praise(), e, k)
+  end)
 //
 | L0Elazy(e) =>
   xcps(e, lam(e) =<cloref1>

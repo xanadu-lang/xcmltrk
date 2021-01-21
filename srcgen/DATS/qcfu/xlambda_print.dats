@@ -100,8 +100,6 @@ case e of
 | L0Etcst(cst, ti) =>
   fprint!(fp, "L0Efcst(", cst, ", ", ti, ")")
 //
-(* TODO: L0Etimp *)
-//
 | L0Edapp(e1, es) =>
   fprint!(fp, "L0Edapp(", e1, ", ", es, ")")
 //
@@ -138,7 +136,8 @@ case e of
 | L0Elam_hdvar(hdv, e) =>
   fprint!(fp, "L0Elam_hdvar(", hdv, ", ", e, ")")
 //
-(* TODO: L0Etry0 *)
+| L0Etry0(t, e, clau) =>
+  fprint!(fp, "L0Etry0(", t, ", ", e, ", ", clau, ")")
 //
 | L0Eaddr(e) =>
   fprint!(fp, "L0Eaddr(", e, ")")
@@ -156,7 +155,8 @@ case e of
 | L0Efree(i, e) =>
   fprint!(fp, "L0Efree(", i, ", ", e, ")")
 //
-(* TODO: L0Eraise *)
+| L0Eraise(e) =>
+  fprint!(fp, "L0Eraise(", e, ")")
 //
 | L0Elazy(e) =>
   fprint!(fp, "L0Elazy(", e, ")")
@@ -167,9 +167,6 @@ case e of
   fprint!(fp, "L0Enone0()")
 | L0Enone1(p) =>
   fprint!(fp, "L0Enone1(", p, ")")
-//
-| L0Ehalt() =>
-  fprint!(fp, "L0Ehalt()")
 
 (* ****** ****** *)
 

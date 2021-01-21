@@ -38,7 +38,7 @@ l0exp =
 | L0Efcst of (hdcst)
 | L0Etcst of (hdcst, htiarg)
 //
-(* TODO: L0Etimp *)
+(* NOTE: convert L0Etimp *)
 //
 | L0Edapp of (l0exp, l0explst)
 //
@@ -66,7 +66,7 @@ l0exp =
 | L0Elam_hdcst of (hdcstlst, l0exp) // hfundecl lambda
 | L0Elam_hdvar of (hdvarlst, l0exp) // hvardecl lambda
 //
-(* TODO: L0Etry0 *)
+| L0Etry0 of (token, l0exp, l0claulst) // NOTE: primop
 //
 | L0Eaddr of (l0exp) // NOTE: primop
 | L0Eflat of (l0exp) // NOTE: primop
@@ -78,7 +78,7 @@ l0exp =
 //
 | L0Efree of (int, l0exp) // NOTE: primop
 //
-(* TODO: L0Eraise *)
+| L0Eraise of (l0exp) // NOTE: primop
 //
 | L0Elazy of (l0exp) // NOTE: primop
 | L0Ellazy of (l0exp, l0explst) // NOTE: primop

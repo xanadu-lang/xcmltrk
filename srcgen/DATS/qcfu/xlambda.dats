@@ -45,7 +45,12 @@ case node of
 | H0Efcst(c) => L0Efcst(c)
 | H0Etcst(c, a) => L0Etcst(c, a)
 //
-(* TODO: L0Etimp *)
+| H0Etimp(_, e, _, dcl, _) =>
+  let
+  val e = xlambda(e)
+  in
+  xlambda(dcl, e)
+  end
 //
 | H0Edapp(e1, _, e2) =>
   let
@@ -178,7 +183,13 @@ case node of
   L0Efix(dcls)
   end
 //
-(* TODO: L0Etry0 *)
+| H0Etry0(t, e, clau) => 
+  let
+  val e = xlambda(e)
+  val clau = xlambda(clau)
+  in
+  L0Etry0(t, e, clau)
+  end
 //
 | H0Eaddr(e) =>
   let
@@ -220,7 +231,12 @@ case node of
   L0Efree(knd, e)
   end
 //
-(* TODO: L0Eraise *)
+| H0Eraise(e) =>
+  let
+  val e = xlambda(e)
+  in
+  L0Eraise(e)
+  end
 //
 | H0Elazy(e) =>
   let
@@ -390,12 +406,15 @@ case node of
   end
   }
 //
-(* TODO: exception *)
+| H0Cexcptcon(_) => e
 //
 | H0Cimpdecl3(t, s, d, q, hdc, ta, arg, exp) =>
   let
   val exp = xlambda(exp)
-  val fexp = L0Elam_hfarg(arg, exp)
+  val fexp = 
+  case arg of 
+  | list_cons(_,_) => L0Elam_hfarg(arg, exp)
+  | list_nil() => exp
   val fexps =
   list_vt2t(list_make_sing<l0exp>(fexp))
   //

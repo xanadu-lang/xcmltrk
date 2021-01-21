@@ -57,8 +57,6 @@ datatype c0val =
 | C0Vfcst of (hdcst)
 | C0Vtcst of (hdcst, htiarg)
 //
-(* TODO: C0Etimp *)
-//
 | C0Vfix of // recursive lambda
 ( cfundeclst) 
 //
@@ -146,9 +144,9 @@ and c0primop =
 | C0Plazy of () // unary
 | C0Pllazy of () // N+1nary
 //
-(* TODO: C0Etry0 *)
+| C0Ptry0 of (token) // N+1nary
 //
-(* TODO: C0Eraise *)
+| C0Praise of () // unary
 //
 
 and c0gpat =

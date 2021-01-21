@@ -267,6 +267,12 @@ case prim of
   fprint!(fp, "C0Plazy()")
 | C0Pllazy() =>
   fprint!(fp, "C0Pllazy()")
+//
+| C0Ptry0(t) =>
+  fprint!(fp, "C0Ptry0(", t, ")")
+//
+| C0Praise() =>
+  fprint!(fp, "C0Praise()")
 
 (* ****** ****** *)
 
