@@ -1,3 +1,4 @@
 .DS_Store
-*/BUILD/*
-*/bin/*
+**.o
+**.c
+bin/*
