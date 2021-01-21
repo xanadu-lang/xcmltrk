@@ -111,10 +111,10 @@ case v of
 | C0Vvknd(i, v) =>
   fprint!(fp, "C0Vvnd(", i, ", ", v, ")")
 //
-| C0Vfcon(c) =>
-  fprint!(fp, "C0Vfcon(", c, ")")
-| C0Vtcon(c, ht) =>
-  fprint!(fp, "C0Vtcon(", c, ", ", ht, ")")
+| C0Vfcon(c, vs) =>
+  fprint!(fp, "C0Vfcon(", c, ", [", vs, "])")
+| C0Vtcon(c, ht, vs) =>
+  fprint!(fp, "C0Vtcon(", c, ", ", ht, " [", vs, "])")
 //
 | C0Vfcst(cst) =>
   fprint!(fp, "C0Vfcst(", cst, ")")

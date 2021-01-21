@@ -51,8 +51,13 @@ datatype c0val =
 | C0Vvar of (hdvar) // user variable
 | C0Vvknd of (int, hdvar) // user variable
 //
-| C0Vfcon of (hdcon)
-| C0Vtcon of (hdcon, htiarg)
+| C0Vfcon of // function constructor
+( hdcon(*name*)
+, c0valst(*term args*)) // NOTE: args supplied at runtime
+| C0Vtcon of // template constructor
+( hdcon(*name*)
+, htiarg(*type args*)
+, c0valst(*term args*)) // NOTE: args supplied at runtime
 //
 | C0Vfcst of (hdcst)
 | C0Vtcst of (hdcst, htiarg)

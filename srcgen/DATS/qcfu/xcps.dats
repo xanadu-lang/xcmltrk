@@ -105,8 +105,10 @@ case e of
 | L0Evar(v) => c(C0Vvar(v))
 | L0Evknd(i, v) => c(C0Vvknd(i, v))
 //
-| L0Efcon(hc) => c(C0Vfcon(hc))
-| L0Etcon(hc, ht) => c(C0Vtcon(hc, ht))
+| L0Efcon(hc) => 
+  c(C0Vfcon(hc, list_nil()))
+| L0Etcon(hc, ht) => 
+  c(C0Vtcon(hc, ht, list_nil()))
 //
 | L0Efcst(hc) => c(C0Vfcst(hc))
 | L0Etcst(hc, ht) => c(C0Vtcst(hc, ht))
