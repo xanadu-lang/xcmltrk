@@ -84,7 +84,10 @@ fprint!(stderr_ref, v)
 
 implement
 fprint_c0val(fp, v) =
-case v of
+let
+val node = v.node()
+in
+case node of
 | C0Vi00(x) =>
   fprint!(fp, "C0Vi00(", x, ")")
 | C0Vb00(x) =>
@@ -111,10 +114,10 @@ case v of
 | C0Vvknd(i, v) =>
   fprint!(fp, "C0Vvnd(", i, ", ", v, ")")
 //
-| C0Vfcon(c, vs) =>
-  fprint!(fp, "C0Vfcon(", c, ", [", vs, "])")
-| C0Vtcon(c, ht, vs) =>
-  fprint!(fp, "C0Vtcon(", c, ", ", ht, " [", vs, "])")
+| C0Vfcon(c) =>
+  fprint!(fp, "C0Vfcon(", c, ")")
+| C0Vtcon(c, ht) =>
+  fprint!(fp, "C0Vtcon(", c, ", ", ht, ")")
 //
 | C0Vfcst(cst) =>
   fprint!(fp, "C0Vfcst(", cst, ")")
@@ -136,7 +139,7 @@ case v of
   fprint!(fp, "C0Vnone0()")
 | C0Vnone1(p) =>
   fprint!(fp, "C0Vnone1(", p, ")")
-
+end
 (* ****** ****** *)
   
 implement
@@ -149,15 +152,17 @@ fprint!(stderr_ref, e)
 
 implement
 fprint_c0exp(fp, e) =
-case e of
+let
+val node = e.node()
+in
+case node of
 | C0Eret(c, v) =>
   fprint!(fp, "C0Eret(", c, ", ", v, ")")
 | C0Edapp(f, arg, k) =>
   fprint!(fp, "C0Edapp(", f, ", [", arg, "], ", k, ")")
 | C0Eprimop(prim, arg, k) =>
   fprint!(fp, "C0Eprimop(", prim, ", [", arg, "], ", k, ")")
-| C0Ehalt() =>
-  fprint!(fp, "C0Ehalt()")
+end
 
 (* ****** ****** *)
 
@@ -171,11 +176,17 @@ fprint!(stderr_ref, k)
 
 implement
 fprint_c0nt(fp, k) =
-case k of
+let
+val node = k.node()
+in
+case node of
+| C0HALT() =>
+  fprint!(fp, "C0HALT()")
 | C0VAR(k) =>
   fprint!(fp, "C0VAR(", k, ")")
 | C0NT(arg, e) =>
   fprint!(fp, "C0NT(", arg, ", ", e, ")")
+end
 
 (* ****** ****** *)
 
@@ -190,7 +201,8 @@ fprint!(stderr_ref, fdcl)
 implement
 fprint_cfundecl(fp, fdcl) =
 let
-val CFUNDECL(fdcl) = fdcl
+val node = fdcl.node()
+val CFUNDECL(fdcl) = node
 in
 case fdcl.hag of
 | Some(fdcl_hag) =>
@@ -222,7 +234,10 @@ fprint!(stderr_ref, prim)
 
 implement
 fprint_c0primop(fp, prim) =
-case prim of
+let
+val node = prim.node()
+in
+case node of
 | C0Ppcon(l) =>
   fprint!(fp, "C0Ppcon(", l, ")")
 | C0Ppbox(l, i) =>
@@ -273,6 +288,7 @@ case prim of
 //
 | C0Praise() =>
   fprint!(fp, "C0Praise()")
+end
 
 (* ****** ****** *)
 
@@ -286,11 +302,15 @@ fprint!(stderr_ref, pat)
 
 implement
 fprint_c0gpat(fp, pat) =
-case pat of
+let
+val node = pat.node()
+in
+case node of
 | C0GPATpat(pat) =>
   fprint!(fp, "C0GPATpat(", pat, ")")
 | C0GPATgua(pat, gua) =>
   fprint!(fp, "C0GPATgua(", pat, ", ", gua, ")")
+end
 
 (* ****** ****** *)
 
@@ -304,8 +324,12 @@ fprint!(stderr_ref, gua)
 
 implement
 fprint_c0gua(fp, gua) =
-case gua of
+let
+val node = gua.node()
+in
+case node of
 | C0GUAexp(e) =>
   fprint!(fp, "C0GUAexp(", e, ")")
 | C0GUAmat(e, pat) =>
   fprint!(fp, "C0GUAmat(", e, ", ", pat, ")")
+end

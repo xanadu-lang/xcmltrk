@@ -16,26 +16,130 @@ typedef hdcstopt = Option(hdcst)
 typedef hdcstlst = List0(hdcst)
 
 (* ****** ****** *)
- 
-abstype kvar = ptr
-
-(* ****** ****** *)
 
 fun fresh_hdvar(string): hdvar
 
 (* ****** ****** *)
+ 
+abstbox kvar_tbox = ptr
+typedef kvar = kvar_tbox
 
 fun fresh_kvar(string): kvar
-fun eq_kvar(kvar, kvar): bool
-
 fun tostring_kvar(kvar): string
 fun tostamp_kvar(kvar): int
 
+fun eq_kvar(kvar, kvar): bool
 overload = with eq_kvar
+
+fun print_kvar(kvar): void
+fun prerr_kvar(kvar): void
+fun fprint_kvar(FILEref, kvar): void
+
+overload print with print_kvar
+overload prerr with prerr_kvar
+overload fprint with fprint_kvar
+
+(* ****** ****** *)
+
+abstbox c0val_tbox = ptr
+typedef c0val = c0val_tbox
+typedef c0valst = List0(c0val)
+
+fun print_c0val(c0val): void
+fun prerr_c0val(c0val): void
+fun fprint_c0val(FILEref, c0val): void
+
+overload print with print_c0val
+overload prerr with prerr_c0val
+overload fprint with fprint_c0val
+
+(* ****** ****** *)
+
+abstbox c0exp_tbox = ptr
+typedef c0exp = c0exp_tbox
+typedef c0explst = List0(c0exp)
+typedef c0expopt = Option(c0exp)
+
+fun print_c0exp(c0exp): void
+fun prerr_c0exp(c0exp): void
+fun fprint_c0exp(FILEref, c0exp): void
+
+overload print with print_c0exp
+overload prerr with prerr_c0exp
+overload fprint with fprint_c0exp
+
+(* ****** ****** *)
+
+abstbox c0nt_tbox = ptr
+typedef c0nt = c0nt_tbox
+typedef c0ntlst = List0(c0nt)
+
+fun print_c0nt(c0nt): void
+fun prerr_c0nt(c0nt): void
+fun fprint_c0nt(FILEref, c0nt): void
+
+overload print with print_c0nt
+overload prerr with prerr_c0nt
+overload fprint with fprint_c0nt
+  
+(* ****** ****** *)
+  
+abstbox cfundecl_tbox = ptr
+typedef cfundecl = cfundecl_tbox
+typedef cfundeclst = List0(cfundecl)
+
+fun print_cfundecl(cfundecl): void
+fun prerr_cfundecl(cfundecl): void
+fun fprint_cfundecl(FILEref, cfundecl): void
+
+overload print with print_cfundecl
+overload prerr with prerr_cfundecl
+overload fprint with fprint_cfundecl
+
+(* ****** ****** *)
+
+abstbox c0primop_tbox = ptr
+typedef c0primop = c0primop_tbox
+
+fun print_c0primop(c0primop): void
+fun prerr_c0primop(c0primop): void
+fun fprint_c0primop(FILEref, c0primop): void
+
+overload print with print_c0primop
+overload prerr with prerr_c0primop
+overload fprint with fprint_c0primop
+  
+(* ****** ****** *)
+  
+abstbox c0gpat_tbox = ptr
+typedef c0gpat = c0gpat_tbox
+typedef c0gpatlst = List0(c0gpat)
+
+fun print_c0gpat(c0gpat): void
+fun prerr_c0gpat(c0gpat): void
+fun fprint_c0gpat(FILEref, c0gpat): void
+
+overload print with print_c0gpat
+overload prerr with prerr_c0gpat
+overload fprint with fprint_c0gpat
+
+(* ****** ****** *)
+
+abstbox c0gua_tbox = ptr
+typedef c0gua = c0gua_tbox
+typedef c0gualst = List0(c0gua)
+
+fun print_c0gua(c0gua): void
+fun prerr_c0gua(c0gua): void
+fun fprint_c0gua(FILEref, c0gua): void
+
+overload print with print_c0gua
+overload prerr with prerr_c0gua
+overload fprint with fprint_c0gua
 
 (* ****** ****** *)
   
-datatype c0val =
+datatype c0val_node =
 | C0Vi00 of (int)
 | C0Vb00 of (bool)
 | C0Vs00 of string
@@ -51,13 +155,8 @@ datatype c0val =
 | C0Vvar of (hdvar) // user variable
 | C0Vvknd of (int, hdvar) // user variable
 //
-| C0Vfcon of // function constructor
-( hdcon(*name*)
-, c0valst(*term args*)) // NOTE: args supplied at runtime
-| C0Vtcon of // template constructor
-( hdcon(*name*)
-, htiarg(*type args*)
-, c0valst(*term args*)) // NOTE: args supplied at runtime
+| C0Vfcon of (hdcon)
+| C0Vtcon of (hdcon, htiarg)
 //
 | C0Vfcst of (hdcst)
 | C0Vtcst of (hdcst, htiarg)
@@ -88,7 +187,16 @@ datatype c0val =
 | C0Vnone0 of ()
 | C0Vnone1 of (dataptr)
 
-and c0exp =
+fun c0val_make_node(c0val_node): c0val
+fun c0val_get_node(c0val): c0val_node
+fun c0val_get_label(c0val): int
+ 
+overload .node with c0val_get_node 
+overload .label with c0val_get_label
+
+(* ****** ****** *)
+
+datatype c0exp_node =
 | C0Eret of // continuation application
 ( c0nt(*cont*)
 , c0val(*arg*) )
@@ -102,25 +210,51 @@ and c0exp =
 ( c0primop(*primop*)
 , c0valst(*arg*)
 , c0ntlst(*cont*))
-//
-| C0Ehalt of ()
 
-and c0nt =
+fun c0exp_make_node(c0exp_node): c0exp
+fun c0exp_get_node(c0exp): c0exp_node
+fun c0exp_get_label(c0exp): int
+
+overload .node with c0exp_get_node
+overload .label with c0exp_get_label
+
+(* ****** ****** *)
+
+datatype c0nt_node =
+| C0HALT of ()
 | C0VAR of (kvar)
 //
 | C0NT of // continuation
 ( hdvar(*arg*)
 , c0exp(*body*))
+
+fun c0nt_make_node(c0nt_node): c0nt
+fun c0nt_get_node(c0nt): c0nt_node
+fun c0nt_get_label(c0nt): int
+
+overload .node with c0nt_get_node
+overload .label with c0nt_get_label
+
+(* ****** ****** *)
  
-and cfundecl = 
+datatype cfundecl_node = 
 CFUNDECL of  
 @{ nam= hdvar
  , hag= hfarglstopt  
  , knt= kvar
  , def= c0expopt
 }
+
+fun cfundecl_make_node(cfundecl_node): cfundecl 
+fun cfundecl_get_node(cfundecl): cfundecl_node
+fun cfundecl_get_label(cfundecl): int
+
+overload .node with cfundecl_get_node
+overload .label with cfundecl_get_label
+
+(* ****** ****** *)
   
-and c0primop =
+datatype c0primop_node =
 | C0Ppcon of (label) // unary
 | C0Ppbox of (label, int) // unary
 //
@@ -152,104 +286,39 @@ and c0primop =
 | C0Ptry0 of (token) // N+1nary
 //
 | C0Praise of () // unary
-//
 
-and c0gpat =
+fun c0primop_make_node(c0primop_node): c0primop
+fun c0primop_get_node(c0primop): c0primop_node
+fun c0primop_get_label(c0primop): int
+
+overload .node with c0primop_get_node
+overload .label with c0primop_get_label
+
+(* ****** ****** *)
+
+datatype c0gpat_node =
 | C0GPATpat of (h0pat)
 | C0GPATgua of (h0pat, c0gualst)
 
-and c0gua =
+fun c0gpat_make_node(c0gpat_node): c0gpat
+fun c0gpat_get_node(c0gpat): c0gpat_node
+fun c0gpat_get_label(c0gpat): int
+
+overload .node with c0gpat_get_node
+overload .label with c0gpat_get_label
+
+(* ****** ****** *)
+
+datatype c0gua_node =
 | C0GUAexp of (c0val)
 | C0GUAmat of (c0val, h0pat)
 
-where cfundeclst = List0(cfundecl)
-and c0explst = List0(c0exp)
-and c0valst = List0(c0val)
-and c0ntlst = List0(c0nt)
-and c0gpatlst = List0(c0gpat)
-and c0gualst = List0(c0gua)
+fun c0gua_make_node(c0gua_node): c0gua
+fun c0gua_get_node(c0gua): c0gua_node
+fun c0gua_get_label(c0gua): int
 
-and c0expopt = Option(c0exp)
-
-(* ****** ****** *)
-
-fun print_kvar(kvar): void
-fun prerr_kvar(kvar): void
-fun fprint_kvar(FILEref, kvar): void
-
-overload print with print_kvar
-overload prerr with prerr_kvar
-overload fprint with fprint_kvar
-
-(* ****** ****** *)
-
-fun print_c0val(c0val): void
-fun prerr_c0val(c0val): void
-fun fprint_c0val(FILEref, c0val): void
-
-overload print with print_c0val
-overload prerr with prerr_c0val
-overload fprint with fprint_c0val
-
-(* ****** ****** *)
-
-fun print_c0exp(c0exp): void
-fun prerr_c0exp(c0exp): void
-fun fprint_c0exp(FILEref, c0exp): void
-
-overload print with print_c0exp
-overload prerr with prerr_c0exp
-overload fprint with fprint_c0exp
-
-(* ****** ****** *)
-
-fun print_c0nt(c0nt): void
-fun prerr_c0nt(c0nt): void
-fun fprint_c0nt(FILEref, c0nt): void
-
-overload print with print_c0nt
-overload prerr with prerr_c0nt
-overload fprint with fprint_c0nt
-
-(* ****** ****** *)
-
-fun print_cfundecl(cfundecl): void
-fun prerr_cfundecl(cfundecl): void
-fun fprint_cfundecl(FILEref, cfundecl): void
-
-overload print with print_cfundecl
-overload prerr with prerr_cfundecl
-overload fprint with fprint_cfundecl
-
-(* ****** ****** *)
-
-fun print_c0primop(c0primop): void
-fun prerr_c0primop(c0primop): void
-fun fprint_c0primop(FILEref, c0primop): void
-
-overload print with print_c0primop
-overload prerr with prerr_c0primop
-overload fprint with fprint_c0primop
-
-(* ****** ****** *)
-
-fun print_c0gpat(c0gpat): void
-fun prerr_c0gpat(c0gpat): void
-fun fprint_c0gpat(FILEref, c0gpat): void
-
-overload print with print_c0gpat
-overload prerr with prerr_c0gpat
-overload fprint with fprint_c0gpat
-
-(* ****** ****** *)
-
-fun print_c0gua(c0gua): void
-fun prerr_c0gua(c0gua): void
-fun fprint_c0gua(FILEref, c0gua): void
-
-overload print with print_c0gua
-overload prerr with prerr_c0gua
-overload fprint with fprint_c0gua
+overload .node with c0gua_get_node
+overload .label with c0gua_get_label
 
 (* ****** ****** *)
 
@@ -302,5 +371,59 @@ overload xcps with xcps_l0gua
 overload xcps with xcps_l0gualst
 
 (* ****** ****** *)
+ 
+fun fresh_c0val(c0val): c0val
+fun fresh_c0valst(c0valst): c0valst
+ 
+overload fresh with fresh_c0val
+overload fresh with fresh_c0valst
+ 
+(* ****** ****** *)
+ 
+fun fresh_c0exp(c0exp): c0exp
+fun fresh_c0explst(c0explst): c0explst
 
+overload fresh with fresh_c0exp
+overload fresh with fresh_c0explst
 
+(* ****** ****** *)
+
+fun fresh_c0nt(c0nt): c0nt
+fun fresh_c0ntlst(c0ntlst): c0ntlst
+
+overload fresh with fresh_c0nt
+overload fresh with fresh_c0ntlst
+ 
+(* ****** ****** *)
+
+fun fresh_cfundecl(cfundecl): cfundecl
+fun fresh_cfundeclst(cfundeclst): cfundeclst
+
+overload fresh with fresh_cfundecl
+overload fresh with fresh_cfundeclst
+ 
+(* ****** ****** *)
+
+fun fresh_c0primop(c0primop): c0primop
+
+overload fresh with fresh_c0primop
+
+(* ****** ****** *)
+
+fun fresh_c0gpat(c0gpat): c0gpat
+fun fresh_c0gpatlst(c0gpatlst): c0gpatlst
+
+overload fresh with fresh_c0gpat
+overload fresh with fresh_c0gpatlst
+
+(* ****** ****** *)
+
+fun fresh_c0gua(c0gua): c0gua
+fun fresh_c0gualst(c0gualst): c0gualst
+
+overload fresh with fresh_c0gua
+overload fresh with fresh_c0gualst
+
+(* ****** ****** *)
+
+fun to_xcps(l0exp): c0exp

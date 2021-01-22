@@ -510,3 +510,9 @@ implement
 list_map$fopr<h0gua><l0gua>(gua) =
 xlambda(gua)
 }
+
+(* ****** ****** *)
+
+implement
+to_xlambda(dcl) =
+xlambda(dcl, L0Enone0())

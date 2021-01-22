@@ -206,3 +206,8 @@ xlambda_h0gualst(h0gualst): l0gualst
 
 overload xlambda with xlambda_h0gua
 overload xlambda with xlambda_h0gualst
+
+(* ****** ****** *)
+
+fun
+to_xlambda(h0dclist): l0exp

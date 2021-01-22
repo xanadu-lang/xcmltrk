@@ -31,10 +31,18 @@ end
 
 (* ****** ****** *)
 
+typedef 
+kvar_struct = @{
+  nam= string  
+, stamp= int
+}
+
+absimpl 
+kvar_tbox = ref(kvar_struct)
+
 local
 
 val kvar_stamp = ref<int>(0)
-assume kvar = '(string, int)
 
 in
 
@@ -44,35 +52,180 @@ let
 val n = kvar_stamp[]
 val () = kvar_stamp[] := n + 1
 in
-'(s, n)
+ref<kvar_struct>
+@{
+  nam= s  
+, stamp= n
+}
 end
+
+implement
+tostring_kvar(k) =
+k->nam
+
+implement
+tostamp_kvar(k) =
+k->stamp
 
 implement 
-eq_kvar(v1, v2) =
-let
-val '(_, n1) = v1
-val '(_, n2) = v2
-in
-n1 = n2
-end
-
-implement
-tostring_kvar(v) =
-let
-val '(s, i) = v
-in
-s
-end
-
-implement
-tostamp_kvar(v) =
-let
-val '(s, i) = v
-in
-i
-end
+eq_kvar(k1, k2) =
+k1->stamp = k2->stamp
  
 end
+
+(* ****** ****** *)
+
+absimpl 
+c0val_tbox = '{
+  node= c0val_node  
+, label= int
+}
+
+implement
+c0val_make_node(node) = '{
+  node= node
+, label= ~1
+}
+
+implement
+c0val_get_node(x) =
+x.node
+
+implement
+c0val_get_label(x) =
+x.label
+
+(* ****** ****** *)
+
+absimpl
+c0exp_tbox = '{
+  node= c0exp_node  
+, label= int
+}
+
+implement
+c0exp_make_node(node) = '{
+  node= node
+, label= ~1
+}
+
+implement
+c0exp_get_node(x) =
+x.node
+
+implement
+c0exp_get_label(x) =
+x.label
+
+(* ****** ****** *)
+
+absimpl 
+c0nt_tbox = '{
+  node= c0nt_node  
+, label= int
+}
+
+implement
+c0nt_make_node(node) = '{
+  node= node
+, label= ~1
+}
+
+implement
+c0nt_get_node(x) =
+x.node
+
+implement
+c0nt_get_label(x) =
+x.label
+  
+(* ****** ****** *)
+
+absimpl 
+cfundecl_tbox = '{
+  node= cfundecl_node  
+, label= int
+}
+
+implement
+cfundecl_make_node(node) = '{
+  node= node
+, label= ~1
+}
+
+implement
+cfundecl_get_node(x) =
+x.node
+
+implement
+cfundecl_get_label(x) =
+x.label
+  
+(* ****** ****** *)
+
+absimpl 
+c0primop_tbox =  '{
+  node= c0primop_node  
+, label= int
+}
+
+implement
+c0primop_make_node(node) = '{
+  node= node
+, label= ~1
+}
+
+implement
+c0primop_get_node(x) =
+x.node
+
+implement
+c0primop_get_label(x) =
+x.label
+
+(* ****** ****** *)
+
+absimpl 
+c0gpat_tbox = '{
+  node= c0gpat_node  
+, label= int
+}
+
+implement
+c0gpat_make_node(node) = '{
+  node= node
+, label= ~1
+}
+
+implement
+c0gpat_get_node(x) =
+x.node
+
+implement
+c0gpat_get_label(x) =
+x.label
+
+(* ****** ****** *)
+
+absimpl 
+c0gua_tbox = '{
+  node= c0gua_node  
+, label= int
+}
+
+implement
+c0gua_make_node(node) = '{
+  node= node
+, label= ~1
+}
+
+implement
+c0gua_get_node(x) =
+x.node
+
+implement
+c0gua_get_label(x) =
+x.label
 
 (* ****** ****** *)
   
@@ -85,128 +238,142 @@ case es of
   c(list_cons(e, es))))
 | list_nil() => c(list_nil())
 
-(* ****** ****** *)
-
 implement
 xcps_l0exp(e, c) =
 case e of
-| L0Ei00(x) => c(C0Vi00(x))
-| L0Eb00(x) => c(C0Vb00(x))
-| L0Es00(x) => c(C0Vs00(x))
+| L0Ei00(x) => c(c0val_make_node(C0Vi00(x)))
+| L0Eb00(x) => c(c0val_make_node(C0Vb00(x)))
+| L0Es00(x) => c(c0val_make_node(C0Vs00(x)))
 //
-| L0Eint(t) => c(C0Vint(t))
-| L0Ebtf(t) => c(C0Vbtf(t))
-| L0Echr(t) => c(C0Vchr(t))
-| L0Eflt(t) => c(C0Vflt(t))
-| L0Estr(t) => c(C0Vstr(t))
+| L0Eint(t) => c(c0val_make_node(C0Vint(t)))
+| L0Ebtf(t) => c(c0val_make_node(C0Vbtf(t)))
+| L0Echr(t) => c(c0val_make_node(C0Vchr(t)))
+| L0Eflt(t) => c(c0val_make_node(C0Vflt(t)))
+| L0Estr(t) => c(c0val_make_node(C0Vstr(t)))
 //
-| L0Etop(t) => c(C0Vtop(t))
+| L0Etop(t) => c(c0val_make_node(C0Vtop(t)))
 //
-| L0Evar(v) => c(C0Vvar(v))
-| L0Evknd(i, v) => c(C0Vvknd(i, v))
+| L0Evar(v) => c(c0val_make_node(C0Vvar(v)))
+| L0Evknd(i, v) => c(c0val_make_node(C0Vvknd(i, v)))
 //
-| L0Efcon(hc) => 
-  c(C0Vfcon(hc, list_nil()))
-| L0Etcon(hc, ht) => 
-  c(C0Vtcon(hc, ht, list_nil()))
+| L0Efcon(hc) => c(c0val_make_node(C0Vfcon(hc)))
+| L0Etcon(hc, ht) => c(c0val_make_node(C0Vtcon(hc, ht)))
 //
-| L0Efcst(hc) => c(C0Vfcst(hc))
-| L0Etcst(hc, ht) => c(C0Vtcst(hc, ht))
+| L0Efcst(hc) => c(c0val_make_node(C0Vfcst(hc)))
+| L0Etcst(hc, ht) => c(c0val_make_node(C0Vtcst(hc, ht)))
 //
 | L0Edapp(e, es) =>
-  let
-  val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
-  in
   xcps(e, lam(e) =<cloref1> 
   xcps(es, lam(es) =<cloref1> 
-  C0Edapp(e, es, k) 
-  ))
-  end
+  let
+  val x = fresh_hdvar("x")
+  val xbod = c0val_make_node(C0Vvar(x))
+  //
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
+  in
+  c0exp_make_node(C0Edapp(e, es, k))
+  end))
 //
 | L0Epcon(e, l) =>
   xcps(e, lam(e) =<cloref1> 
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
-  val k = 
+  val xbod = c0val_make_node(C0Vvar(x))
+  //
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
+  val ks = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
-  val e = 
+  val es = 
   list_vt2t(list_make_sing<c0val>(e))
+  //
+  val p = c0primop_make_node(C0Ppcon(l))
   in
-  C0Eprimop(C0Ppcon(l), e, k) 
+  c0exp_make_node(C0Eprimop(p, es, ks))
   end)
 | L0Epbox(e, l, i) =>
   xcps(e, lam(e) =<cloref1> 
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
-  val k = 
+  val xbod = c0val_make_node(C0Vvar(x))
+  //
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
+  val ks = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
-  val e = 
+  val es = 
   list_vt2t(list_make_sing<c0val>(e))
+  //
+  val p = c0primop_make_node(C0Ppbox(l, i))
   in
-  C0Eprimop(C0Ppbox(l, i), e, k) 
+  c0exp_make_node(C0Eprimop(p, es, ks))
   end)
 //
 | L0Eproj(e, l, i) =>
   xcps(e, lam(e) =<cloref1> 
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
-  val k = 
+  val xbod = c0val_make_node(C0Vvar(x))
+  //
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
+  val ks = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
-  val e = 
+  val es = 
   list_vt2t(list_make_sing<c0val>(e))
+  //
+  val p = c0primop_make_node(C0Pproj(l, i))
   in
-  C0Eprimop(C0Pproj(l, i), e, k) 
+  c0exp_make_node(C0Eprimop(p, es, ks))
   end)
 | L0Eplft(e, l, i) =>
   xcps(e, lam(e) =<cloref1> 
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
-  val k = 
+  val xbod = c0val_make_node(C0Vvar(x))
+  //
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
+  val ks = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
-  val e = 
+  val es = 
   list_vt2t(list_make_sing<c0val>(e))
+  //
+  val p = c0primop_make_node(C0Pplft(l, i))
   in
-  C0Eprimop(C0Pplft(l, i), e, k) 
+  c0exp_make_node(C0Eprimop(p, es, ks))
   end)
 | L0Epptr(e, l, i) =>
   xcps(e, lam(e) =<cloref1> 
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
-  val k = 
+  val xbod = c0val_make_node(C0Vvar(x))
+  //
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
+  val ks = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
-  val e = 
+  val es = 
   list_vt2t(list_make_sing<c0val>(e))
+  //
+  val p = c0primop_make_node(C0Ppptr(l, i))
   in
-  C0Eprimop(C0Ppptr(l, i), e, k) 
+  c0exp_make_node(C0Eprimop(p, es, ks))
   end)
 //
 | L0Etuple(i, j, es) =>
   xcps(es, lam(es) =<cloref1> 
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
-  val k = 
+  val xbod = c0val_make_node(C0Vvar(x))
+  //
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
+  val ks = 
   list_vt2t(list_make_sing<c0nt>(k))
+  //
+  val p = c0primop_make_node(C0Ptuple(i, j))
   in
-  C0Eprimop(C0Ptuple(i, j), es, k) 
+  c0exp_make_node(C0Eprimop(p, es, ks))
   end)
 //
 | L0Eassgn(e1, e2) =>
@@ -214,15 +381,18 @@ case e of
   xcps(e2, lam(e2) =<cloref1>
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
-  val k = 
+  val xbod = c0val_make_node(C0Vvar(x))
+  //
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
+  val ks = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
   val es = 
   list_cons(e1, list_cons(e2, list_nil()))
+  //
+  val p = c0primop_make_node(C0Passgn())
   in
-  C0Eprimop(C0Passgn(), es, k)
+  c0exp_make_node(C0Eprimop(p, es, ks))
   end))
 //
 | L0Eif0(e1, e2, e3) =>
@@ -237,15 +407,16 @@ case e of
   val ybod =
   case e3 of
   | Some(e3) => xcps(e3, lam(e3) =<cloref1> c(e3))
-  | None() => c(C0Vnone0())
+  | None() => c(c0val_make_node(C0Vnone0()))
   //
-  val k2 = C0NT(x, xbod)
-  val k3 = C0NT(y, ybod)
-  //
+  val k2 = c0nt_make_node(C0NT(x, xbod))
+  val k3 = c0nt_make_node(C0NT(y, ybod))
   val ks = 
   list_cons(k2, list_cons(k3, list_nil()))
+  //
+  val p = c0primop_make_node(C0Pif0())
   in
-  C0Eprimop(C0Pif0(), e1, ks)
+  c0exp_make_node(C0Eprimop(p, e1, ks))
   end)
 //
 | L0Ecase(i, e, cs) =>
@@ -256,50 +427,57 @@ case e of
   //
   val x = fresh_hdvar("x")
   val y = fresh_hdvar("y")
+  val xval = c0val_make_node(C0Vvar(x))
   val xbod = 
-  list_vt2t(list_make_sing<c0val>(C0Vvar(x)))
-  val ybod = C0Vvar(y)
+  list_vt2t(list_make_sing<c0val>(xval))
+  val ybod = c0val_make_node(C0Vvar(y))
+  val k = c0nt_make_node(C0NT(y, c(ybod)))
   //
   val cs = xcps(cs, lam(f) =<cloref1> 
-  C0Edapp(f, xbod, C0NT(y, c(ybod))))
+  c0exp_make_node(C0Edapp(f, xbod, k)))
   val ks = 
   list_vt2t(list_map<c0exp><c0nt>(cs))
   where
   {
   implement
   list_map$fopr<c0exp><c0nt>(bod) =
-  C0NT(x, bod)
+  c0nt_make_node(C0NT(x, bod))
   }
+  //
+  val p = c0primop_make_node(C0Pcase(i))
   in
-  C0Eprimop(C0Pcase(i), e, ks)
+  c0exp_make_node(C0Eprimop(p, e, ks))
   end)
 //
 | L0Efix(fdcl) =>
   xcps(fdcl, lam(fdcl) =<cloref1>
-  c(C0Vfix(fdcl)))
+  c(c0val_make_node(C0Vfix(fdcl))))
 | L0Elam_hfarg(a, e) =>
   let
   val k = fresh_kvar("k")
   val bod =
-  xcps(e, lam(e) =<cloref1> C0Eret(C0VAR(k), e))
+  xcps(e, lam(e) =<cloref1> 
+  c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e)))
   in
-  c(C0Vlam_hfarg(a, k, bod))
+  c(c0val_make_node(C0Vlam_hfarg(a, k, bod)))
   end
 | L0Elam_hdcst(a, e) =>
   let
   val k = fresh_kvar("k")
   val bod =
-  xcps(e, lam(e) =<cloref1> C0Eret(C0VAR(k), e))
+  xcps(e, lam(e) =<cloref1> 
+  c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e)))
   in
-  c(C0Vlam_hdcst(a, k, bod))
+  c(c0val_make_node(C0Vlam_hdcst(a, k, bod)))
   end
 | L0Elam_hdvar(a, e) =>
   let
   val k = fresh_kvar("k")
   val bod =
-  xcps(e, lam(e) =<cloref1> C0Eret(C0VAR(k), e))
+  xcps(e, lam(e) =<cloref1> 
+  c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e)))
   in
-  c(C0Vlam_hdvar(a, k, bod))
+  c(c0val_make_node(C0Vlam_hdvar(a, k, bod)))
   end
 //
 | L0Etry0(t, e, cs) =>
@@ -310,159 +488,181 @@ case e of
   //
   val x = fresh_hdvar("x")
   val y = fresh_hdvar("y")
+  val xval = c0val_make_node(C0Vvar(x))
   val xbod = 
-  list_vt2t(list_make_sing<c0val>(C0Vvar(x)))
-  val ybod = C0Vvar(y)
+  list_vt2t(list_make_sing<c0val>(xval))
+  val ybod = c0val_make_node(C0Vvar(y))
   //
+  val k = c0nt_make_node(C0NT(y, c(ybod)))
   val cs = xcps(cs, lam(f) =<cloref1> 
-  C0Edapp(f, xbod, C0NT(y, c(ybod))))
-  val k = C0NT(y, c(ybod))
+  c0exp_make_node(C0Edapp(f, xbod, k)))
+  //
   val ks = 
   list_vt2t(list_map<c0exp><c0nt>(cs))
   where
   {
   implement
   list_map$fopr<c0exp><c0nt>(bod) =
-  C0NT(x, bod)
+  c0nt_make_node(C0NT(x, bod))
   }
+  //
+  val p = c0primop_make_node(C0Ptry0(t))
   in
-  C0Eprimop(C0Ptry0(t), e, list_cons(k, ks))
+  c0exp_make_node(C0Eprimop(p, e, list_cons(k, ks)))
   end)
 //
 | L0Eaddr(e) =>
   xcps(e, lam(e) =<cloref1>
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
+  val xbod = c0val_make_node(C0Vvar(x))
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
   val k = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
   val e = 
   list_vt2t(list_make_sing<c0val>(e))
+  //
+  val p = c0primop_make_node(C0Paddr())
   in
-  C0Eprimop(C0Paddr(), e, k)
+  c0exp_make_node(C0Eprimop(p, e, k))
   end)
 | L0Eflat(e) =>
   xcps(e, lam(e) =<cloref1>
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
+  val xbod = c0val_make_node(C0Vvar(x))
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
   val k = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
   val e = 
   list_vt2t(list_make_sing<c0val>(e))
+  //
+  val p = c0primop_make_node(C0Pflat())
   in
-  C0Eprimop(C0Pflat(), e, k)
+  c0exp_make_node(C0Eprimop(p, e, k))
   end)
 | L0Etalf(e) =>
   xcps(e, lam(e) =<cloref1>
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
+  val xbod = c0val_make_node(C0Vvar(x))
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
   val k = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
   val e = 
   list_vt2t(list_make_sing<c0val>(e))
+  //
+  val p = c0primop_make_node(C0Ptalf())
   in
-  C0Eprimop(C0Ptalf(), e, k)
+  c0exp_make_node(C0Eprimop(p, e, k))
   end)
 //
 | L0Efold(e) =>
   xcps(e, lam(e) =<cloref1>
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
+  val xbod = c0val_make_node(C0Vvar(x))
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
   val k = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
   val e = 
   list_vt2t(list_make_sing<c0val>(e))
+  //
+  val p = c0primop_make_node(C0Pfold())
   in
-  C0Eprimop(C0Pfold(), e, k)
+  c0exp_make_node(C0Eprimop(p, e, k))
   end)
 //
 | L0Eeval(i, e) =>
   xcps(e, lam(e) =<cloref1>
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
+  val xbod = c0val_make_node(C0Vvar(x))
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
   val k = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
   val e = 
   list_vt2t(list_make_sing<c0val>(e))
+  //
+  val p = c0primop_make_node(C0Peval(i))
   in
-  C0Eprimop(C0Peval(i), e, k)
+  c0exp_make_node(C0Eprimop(p, e, k))
   end)
 //
 | L0Efree(i, e) =>
   xcps(e, lam(e) =<cloref1>
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
+  val xbod = c0val_make_node(C0Vvar(x))
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
   val k = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
   val e = 
   list_vt2t(list_make_sing<c0val>(e))
+  //
+  val p = c0primop_make_node(C0Pfree(i))
   in
-  C0Eprimop(C0Pfree(i), e, k)
+  c0exp_make_node(C0Eprimop(p, e, k))
   end)
 //
 | L0Eraise(e) =>
   xcps(e, lam(e) =<cloref1>
   let 
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x, c(xbod))
+  val xbod = c0val_make_node(C0Vvar(x))
+  val k = c0nt_make_node(C0NT(x, c(xbod)))
   val k =
   list_vt2t(list_make_sing<c0nt>(k))
   //
   val e =
   list_vt2t(list_make_sing<c0val>(e))
+  //
+  val p = c0primop_make_node(C0Praise())
   in
-  C0Eprimop(C0Praise(), e, k)
+  c0exp_make_node(C0Eprimop(p, e, k))
   end)
 //
 | L0Elazy(e) =>
   xcps(e, lam(e) =<cloref1>
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
+  val xbod = c0val_make_node(C0Vvar(x))
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
   val k = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
   val e = 
   list_vt2t(list_make_sing<c0val>(e))
+  //
+  val p = c0primop_make_node(C0Plazy())
   in
-  C0Eprimop(C0Plazy(), e, k)
+  c0exp_make_node(C0Eprimop(p, e, k))
   end)
 | L0Ellazy(e, es) =>
   xcps_l0exp(e, lam(e) =<cloref1>
   xcps_l0explst(es, lam(es) =<cloref1>
   let
   val x = fresh_hdvar("x")
-  val xbod = C0Vvar(x)
-  val k = C0NT(x,  c(xbod))
+  val xbod = c0val_make_node(C0Vvar(x))
+  val k = c0nt_make_node(C0NT(x,  c(xbod)))
   val k = 
   list_vt2t(list_make_sing<c0nt>(k))
   //
   val es = list_cons(e, es)
+  //
+  val p = c0primop_make_node(C0Pllazy())
   in
-  C0Eprimop(C0Pllazy(), es, k)
+  c0exp_make_node(C0Eprimop(p, es, k))
   end))
 //
-| L0Enone0() => c(C0Vnone0())
-| L0Enone1(p) => c(C0Vnone1(p))
+| L0Enone0() => c(c0val_make_node(C0Vnone0()))
+| L0Enone1(p) => c(c0val_make_node(C0Vnone1(p)))
 
 (* ****** ****** *)
 
@@ -478,16 +678,16 @@ val e =
 case fdcl.def of
 | Some(e) =>
   Some(xcps(e, lam(e) =<cloref1> 
-  C0Eret(C0VAR(k), e)))
+  c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e))))
 | None() => None()
 //
 in
-c(CFUNDECL(@{
+c(cfundecl_make_node(CFUNDECL(@{
   nam= nam  
 , hag= hag
 , knt= k
 , def= e
-}))
+})))
 end
 
 (* ****** ****** *)
@@ -510,20 +710,22 @@ case clau of
 | L0CLAUpat(gpat) =>
   let
   val k = fresh_kvar("k")
-  val bod = C0Eret(C0VAR(k), C0Vnone0())
+  val bod = 
+  c0exp_make_node(C0Eret
+  (c0nt_make_node(C0VAR(k)), c0val_make_node(C0Vnone0())))
   in
   xcps(gpat, lam(gpat) =<cloref1>
-  c(C0Vlam_c0gpat(gpat, k, bod)))
+  c(c0val_make_node(C0Vlam_c0gpat(gpat, k, bod))))
   end
 | L0CLAUexp(gpat, bod) =>
   let
   val k = fresh_kvar("k")
   val bod = 
   xcps(bod, lam(e) =<cloref1>
-  C0Eret(C0VAR(k), e))
+  c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e)))
   in
   xcps(gpat, lam(gpat) =<cloref1>
-  c(C0Vlam_c0gpat(gpat, k, bod)))
+  c(c0val_make_node(C0Vlam_c0gpat(gpat, k, bod))))
   end
 
 (* ****** ****** *)
@@ -543,10 +745,10 @@ xcps(clau, c)
 implement
 xcps_l0gpat(gpat, c) =
 case gpat of
-| L0GPATpat(pat) => c(C0GPATpat(pat))
+| L0GPATpat(pat) => c(c0gpat_make_node(C0GPATpat(pat)))
 | L0GPATgua(pat, gua) =>
   xcps(gua, lam(gua) =<cloref1> 
-  c(C0GPATgua(pat, gua)))
+  c(c0gpat_make_node(C0GPATgua(pat, gua))))
 
 (* ****** ****** *)
 
@@ -555,10 +757,10 @@ xcps_l0gua(gua, c) =
 case gua of
 | L0GUAexp(e) =>
   xcps(e, lam(e) =<cloref1> 
-  c(C0GUAexp(e)))
+  c(c0gua_make_node(C0GUAexp(e))))
 | L0GUAmat(e, pat) =>
   xcps(e, lam(e) =<cloref1>
-  c(C0GUAmat(e, pat)))
+  c(c0gua_make_node(C0GUAmat(e, pat))))
 
 (* ****** ****** *)
 
@@ -571,3 +773,233 @@ case gualst of
   c(list_cons(gua, gualst))))
 | list_nil() =>
   c(list_nil())
+
+(* ****** ****** *)
+
+local
+
+val label_stamp = ref<int>(0)
+
+in
+
+fun
+fresh_label(): int =
+let
+val n = label_stamp[]
+val () = label_stamp[] := n + 1
+in
+n
+end
+
+end
+
+(* ****** ****** *)
+  
+implement
+fresh_c0val(v) =
+let  
+val node =
+case v.node() of
+| C0Vi00(_) => v.node()
+| C0Vb00(_) => v.node()
+| C0Vs00(_) => v.node()
+//
+| C0Vint(_) => v.node()
+| C0Vbtf(_) => v.node()
+| C0Vchr(_) => v.node()
+| C0Vflt(_) => v.node()
+| C0Vstr(_) => v.node()
+//
+| C0Vtop(_) => v.node()
+//
+| C0Vvar(_) => v.node()
+| C0Vvknd(_,_) => v.node()
+//
+| C0Vfcon(_) => v.node()
+| C0Vtcon(_,_) => v.node()
+//
+| C0Vfcst(_) => v.node()
+| C0Vtcst(_,_) => v.node()
+//
+| C0Vfix(fdcl) => 
+  C0Vfix(fresh(fdcl))
+//
+| C0Vlam_hfarg(hag, k, e) =>
+  C0Vlam_hfarg(hag, k, fresh(e))
+//
+| C0Vlam_hdcst(cst, k, e) =>
+  C0Vlam_hdcst(cst, k, fresh(e))
+//
+| C0Vlam_hdvar(hdv, k, e) =>
+  C0Vlam_hdvar(hdv, k, fresh(e))
+//
+| C0Vlam_c0gpat(gpat, k, e) =>
+  C0Vlam_c0gpat(gpat, k, fresh(e))
+| C0Vnone0() => v.node()
+| C0Vnone1(_) => v.node()
+in
+'{ node= node, label= fresh_label() }
+end
+
+implement
+fresh_c0valst(vs) =
+list_vt2t(list_map<c0val><c0val>(vs))
+where
+{
+implement
+list_map$fopr<c0val><c0val>(v) =
+fresh(v)
+}
+
+(* ****** ****** *)
+
+implement
+fresh_c0exp(e) =
+let
+val node =
+case e.node() of
+| C0Eret(k, v) =>
+  C0Eret(fresh(k), fresh(v))
+| C0Edapp(v, vs, k) =>
+  C0Edapp(fresh(v), fresh(vs), fresh(k))
+| C0Eprimop(p, vs, ks) =>
+  C0Eprimop(fresh(p), fresh(vs), fresh(ks))
+in
+'{ node= node, label= fresh_label() }
+end
+
+implement
+fresh_c0explst(es) =
+list_vt2t(list_map<c0exp><c0exp>(es))
+where
+{
+implement
+list_map$fopr<c0exp><c0exp>(e) =
+fresh(e)
+}
+
+(* ****** ****** *)
+implement
+fresh_c0nt(k) =
+let
+val node =
+case k.node() of
+| C0HALT() => k.node()
+| C0VAR(_) => k.node()
+| C0NT(v, e) =>
+  C0NT(v, fresh(e))
+in
+'{ node= node, label= fresh_label() }
+end
+
+implement
+fresh_c0ntlst(ks) =
+list_vt2t(list_map<c0nt><c0nt>(ks))
+where
+{
+implement
+list_map$fopr<c0nt><c0nt>(k) =
+fresh(k)
+}
+
+(* ****** ****** *)
+
+implement
+fresh_cfundecl(fdcl) =
+let
+val node =
+case fdcl.node() of
+| CFUNDECL(fdcl) =>
+  CFUNDECL(@{
+    nam= fdcl.nam
+  , hag= fdcl.hag
+  , knt= fdcl.knt
+  , def= 
+    case fdcl.def of
+    | Some(def) => Some(fresh(def))
+    | None() => None()
+  })
+in
+'{ node= node, label= fresh_label() }
+end
+
+implement
+fresh_cfundeclst(fdcl) =
+list_vt2t(list_map<cfundecl><cfundecl>(fdcl))
+where
+{
+implement
+list_map$fopr<cfundecl><cfundecl>(fdcl) =
+fresh(fdcl)
+}
+
+(* ****** ****** *)
+
+implement
+fresh_c0primop(p) =
+let
+val node = p.node()
+in
+'{ node= node, label= fresh_label() }
+end
+
+(* ****** ****** *)
+
+implement
+fresh_c0gpat(gpat) =
+let
+val node =
+case gpat.node() of
+| C0GPATpat(_) => gpat.node()
+| C0GPATgua(pat, gua) =>
+  C0GPATgua(pat, fresh(gua))
+in
+'{ node= node, label= fresh_label() }
+end
+
+implement
+fresh_c0gpatlst(gpat) =
+list_vt2t(list_map<c0gpat><c0gpat>(gpat))
+where
+{
+implement
+list_map$fopr<c0gpat><c0gpat>(gpat) =
+fresh(gpat)
+}
+
+(* ****** ****** *)
+
+implement
+fresh_c0gua(gua) =
+let
+val node =
+case gua.node() of
+| C0GUAexp(v) => 
+  C0GUAexp(fresh(v))
+| C0GUAmat(v, pat) =>
+  C0GUAmat(fresh(v), pat)
+in
+'{ node= node, label= fresh_label() }
+end
+
+implement
+fresh_c0gualst(gua) =
+list_vt2t(list_map<c0gua><c0gua>(gua))
+where
+{
+implement
+list_map$fopr<c0gua><c0gua>(gua) =
+fresh(gua)
+}
+  
+(* ****** ****** *)
+
+implement
+to_xcps(e) =
+let
+val e =
+xcps(e, lam(x) =<cloref1>
+c0exp_make_node(C0Eret(c0nt_make_node(C0HALT()), x)))
+in
+fresh(e)
+end
