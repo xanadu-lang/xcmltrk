@@ -48,6 +48,9 @@ implement
 fprint_val<c0primop> = fprint_c0primop
 
 implement
+fprint_val<c0clau> = fprint_c0clau
+
+implement
 fprint_val<c0gpat> = fprint_c0gpat
 
 implement
@@ -132,8 +135,6 @@ case node of
   fprint!(fp, "C0Vlam_hdcst(", hdc, ", ", k, ", ", e, ")")
 | C0Vlam_hdvar(hdv, k, e) =>
   fprint!(fp, "C0Vlam_hdvar(", hdv, ", ", k, ", ", e, ")")
-| C0Vlam_c0gpat(gpat, k, e) =>
-  fprint!(fp, "C0Vlam_c0gpat(", gpat, ", ", k, ", ", e, ")")
 //
 | C0Vnone0() =>
   fprint!(fp, "C0Vnone0()")
@@ -162,6 +163,12 @@ case node of
   fprint!(fp, "C0Edapp(", f, ", [", arg, "], ", k, ")")
 | C0Eprimop(prim, arg, k) =>
   fprint!(fp, "C0Eprimop(", prim, ", [", arg, "], ", k, ")")
+| C0Eif0(v, k1, k2) =>
+  fprint!(fp, "C0Eif0(", v, ", ", k1, ", ", k2, ")")
+| C0Ecase(i, v, vs, k) =>
+  fprint!(fp, "C0Ecase(", i, ", ", v, ", [", vs, "], ", k, ")")
+| C0Etry0(t, v, vs, k) =>
+  fprint!(fp, "C0Etry0(", t, ", ", v, ", [", vs, "], ", k, ")")
 end
 
 (* ****** ****** *)
@@ -256,12 +263,6 @@ case node of
 | C0Passgn() =>
   fprint!(fp, "C0Passgn()")
 //
-| C0Pif0() =>
-  fprint!(fp, "C0Pif0()")
-//
-| C0Pcase(i) =>
-  fprint!(fp, "C0Pcase(", i, ")")
-//
 | C0Paddr() =>
   fprint!(fp, "C0Paddr()")
 | C0Pflat() =>
@@ -283,11 +284,28 @@ case node of
 | C0Pllazy() =>
   fprint!(fp, "C0Pllazy()")
 //
-| C0Ptry0(t) =>
-  fprint!(fp, "C0Ptry0(", t, ")")
-//
 | C0Praise() =>
   fprint!(fp, "C0Praise()")
+end
+
+(* ****** ****** *)
+
+implement
+print_c0clau(clau) =
+fprint!(stdout_ref, clau)
+
+implement
+prerr_c0clau(clau) =
+fprint!(stderr_ref, clau)
+
+implement
+fprint_c0clau(fp, clau) =
+let
+val node = clau.node()
+in
+case node of
+| C0CLAU(gpat, k, e) =>
+  fprint!(fp, "C0CLAU(", gpat, ", ", k, ", ", e, ")")
 end
 
 (* ****** ****** *)

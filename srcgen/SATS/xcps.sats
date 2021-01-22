@@ -44,6 +44,7 @@ overload fprint with fprint_kvar
 abstbox c0val_tbox = ptr
 typedef c0val = c0val_tbox
 typedef c0valst = List0(c0val)
+typedef c0valopt = Option(c0val)
 
 fun print_c0val(c0val): void
 fun prerr_c0val(c0val): void
@@ -109,6 +110,20 @@ overload print with print_c0primop
 overload prerr with prerr_c0primop
 overload fprint with fprint_c0primop
   
+(* ****** ****** *)
+
+abstbox c0clau_tbox = ptr
+typedef c0clau = c0clau_tbox
+typedef c0claulst = List0(c0clau)
+
+fun print_c0clau(c0clau): void
+fun prerr_c0clau(c0clau): void
+fun fprint_c0clau(FILEref, c0clau): void
+
+overload print with print_c0clau
+overload prerr with prerr_c0clau
+overload fprint with fprint_c0clau
+
 (* ****** ****** *)
   
 abstbox c0gpat_tbox = ptr
@@ -179,11 +194,6 @@ datatype c0val_node =
 , kvar(*cont*)
 , c0exp(*body*))
 //
-| C0Vlam_c0gpat of // c0clau lambda
-( c0gpat(*arg*)
-, kvar(*cont*)
-, c0exp(*body*))
-//
 | C0Vnone0 of ()
 | C0Vnone1 of (dataptr)
 
@@ -209,7 +219,24 @@ datatype c0exp_node =
 | C0Eprimop of // primitive operation
 ( c0primop(*primop*)
 , c0valst(*arg*)
-, c0ntlst(*cont*))
+, c0nt(*cont*))
+//
+| C0Eif0 of 
+( c0val(*subject*)
+, c0nt(*cont*)
+, c0nt(*cont*))
+//
+| C0Ecase of // pattern match
+( int
+, c0val(*subject*)
+, c0claulst(*clause*)
+, c0nt(*cont*)) // NOTE: raise exception if unmatched
+//
+| C0Etry0 of // exception handle
+( token
+, c0val(*subject*)
+, c0claulst(*clause*)
+, c0nt(*cont*)) // NOTE: propagate exception if unmatched
 
 fun c0exp_make_node(c0exp_node): c0exp
 fun c0exp_get_node(c0exp): c0exp_node
@@ -266,10 +293,6 @@ datatype c0primop_node =
 //
 | C0Passgn of () // binary
 //
-| C0Pif0 of () // trinary
-//
-| C0Pcase of (int) // N+1nary
-//
 | C0Paddr of () // unary
 | C0Pflat of () // unary
 | C0Ptalf of () // unary
@@ -283,8 +306,6 @@ datatype c0primop_node =
 | C0Plazy of () // unary
 | C0Pllazy of () // N+1nary
 //
-| C0Ptry0 of (token) // N+1nary
-//
 | C0Praise of () // unary
 
 fun c0primop_make_node(c0primop_node): c0primop
@@ -293,6 +314,21 @@ fun c0primop_get_label(c0primop): int
 
 overload .node with c0primop_get_node
 overload .label with c0primop_get_label
+
+(* ****** ****** *)
+ 
+datatype c0clau_node = 
+| C0CLAU of // c0clau lambda
+( c0gpat(*arg*)
+, kvar(*cont*)
+, c0exp(*body*))
+
+fun c0clau_make_node(c0clau_node): c0clau
+fun c0clau_get_node(c0clau): c0clau_node
+fun c0clau_get_label(c0clau): int
+
+overload .node with c0clau_get_node
+overload .label with c0clau_get_label
 
 (* ****** ****** *)
 
@@ -322,11 +358,15 @@ overload .label with c0gua_get_label
 
 (* ****** ****** *)
 
-typedef c0exp_cont = c0val -<cloref1> c0exp
-typedef c0explst_cont = c0valst -<cloref1> c0exp
+typedef c0val_cont = c0val -<cloref1> c0exp
+typedef c0valst_cont = c0valst -<cloref1> c0exp
+typedef c0valopt_cont = c0valopt -<cloref1> c0exp
 
 typedef cfundecl_cont = cfundecl -<cloref1> c0exp
 typedef cfundeclst_cont = cfundeclst -<cloref1> c0exp
+
+typedef c0clau_cont = c0clau-<cloref1> c0exp
+typedef c0claulst_cont = c0claulst -<cloref1> c0exp
 
 typedef c0gpat_cont = c0gpat -<cloref1> c0exp
 
@@ -335,11 +375,13 @@ typedef c0gualst_cont = c0gualst -<cloref1> c0exp
 
 (* ****** ****** *)
 
-fun xcps_l0exp(l0exp, c0exp_cont): c0exp
-fun xcps_l0explst(l0explst, c0explst_cont): c0exp
+fun xcps_l0exp(l0exp, c0val_cont): c0exp
+fun xcps_l0explst(l0explst, c0valst_cont): c0exp
+fun xcps_l0expopt(l0expopt, c0valopt_cont): c0exp
 
 overload xcps with xcps_l0exp
 overload xcps with xcps_l0explst
+overload xcps with xcps_l0expopt
 
 (* ****** ****** *)
 
@@ -351,8 +393,8 @@ overload xcps with xcps_lfundeclst
 
 (* ****** ****** *)
 
-fun xcps_l0clau(l0clau, c0exp_cont): c0exp
-fun xcps_l0claulst(l0claulst, c0exp_cont): c0explst
+fun xcps_l0clau(l0clau, c0clau_cont): c0exp
+fun xcps_l0claulst(l0claulst, c0claulst_cont): c0exp
 
 overload xcps with xcps_l0clau
 overload xcps with xcps_l0claulst
@@ -407,6 +449,14 @@ overload fresh with fresh_cfundeclst
 fun fresh_c0primop(c0primop): c0primop
 
 overload fresh with fresh_c0primop
+
+(* ****** ****** *)
+
+fun fresh_c0clau(c0clau): c0clau
+fun fresh_c0claulst(c0claulst): c0claulst
+
+overload fresh with fresh_c0clau
+overload fresh with fresh_c0claulst
 
 (* ****** ****** *)
 
