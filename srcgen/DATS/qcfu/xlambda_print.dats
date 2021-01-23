@@ -36,6 +36,12 @@ implement
 fprint_val<lfundecl> = fprint_lfundecl
 
 implement
+fprint_val<lvaldecl> = fprint_lvaldecl
+
+implement
+fprint_val<lvardecl> = fprint_lvardecl
+
+implement
 fprint_val<l0clau> = fprint_l0clau
 
 implement
@@ -127,14 +133,21 @@ case e of
 | L0Ecase(i, e, clau) =>
   fprint!(fp, "L0Ecase(", i, ", ", e, ", ", clau, ")")
 //
-| L0Efix(fdcls) =>
-  fprint!(fp, "L0Efix(", fdcls, ")")
-| L0Elam_hfarg(hag, e) =>
-  fprint!(fp, "L0Elam_hfarg(", hag, ", ", e, ")")
-| L0Elam_hdcst(hdc, e) =>
-  fprint!(fp, "L0Elam_hdcst(", hdc, ", ", e, ")")
-| L0Elam_hdvar(hdv, e) =>
-  fprint!(fp, "L0Elam_hdvar(", hdv, ", ", e, ")")
+| L0Eseqn(es, e) =>
+  fprint!(fp, "L0Eseqn([", es, "], ", e, ")")
+//
+| L0Elam(hag, e) =>
+  fprint!(fp, "L0Elam(", hag, ", ", e, ")")
+| L0Efix(v, hag, e) =>
+  fprint!(fp, "L0Efix(", v, ", [", hag, "], ", e, ")")
+| L0Efun(fdcl, e) =>
+  fprint!(fp, "L0Efun([", fdcl, "], ", e, ")")
+| L0Eimp(hdc, hag, bod, e) =>
+  fprint!(fp, "L0Eimp(", hdc, ", [", hag, "], ", bod, ", ", e, ")")
+| L0Elet_val(ldcl, e) =>
+  fprint!(fp, "L0Elet_val([", ldcl, "], ", e, ")")
+| L0Elet_var(ldcl, e) =>
+  fprint!(fp, "L0Elet_var([", ldcl, "], ", e, ")")
 //
 | L0Etry0(t, e, clau) =>
   fprint!(fp, "L0Etry0(", t, ", ", e, ", ", clau, ")")
@@ -197,6 +210,51 @@ case fdcl.hag of
   , "LFUNDECL@{"
   , "nam=", fdcl.nam, ", "
   , "def=", fdcl.def, "}")
+end
+
+(* ****** ****** *)
+
+implement
+print_lvaldecl(ldcl) =
+fprint!(stdout_ref, ldcl)
+
+implement
+prerr_lvaldecl(ldcl) =
+fprint!(stderr_ref, ldcl)
+
+implement
+fprint_lvaldecl(fp, ldcl) =
+let
+val LVALDECL(ldcl) = ldcl
+in
+fprint!
+( fp
+, "LVALDECL@{"
+, "pat=", ldcl.pat, ", "
+, "def=", ldcl.def, "}")
+end
+
+(* ****** ****** *)
+
+implement
+print_lvardecl(ldcl) =
+fprint!(stdout_ref, ldcl)
+
+implement
+prerr_lvardecl(ldcl) =
+fprint!(stderr_ref, ldcl)
+
+implement
+fprint_lvardecl(fp, ldcl) =
+let
+val LVARDECL(ldcl) = ldcl
+in
+fprint!
+( fp
+, "LVARDECL@{"
+, "hdv=", ldcl.hdv, ", "
+, "wth=", ldcl.wth, ", "
+, "ini=", ldcl.ini, "}")
 end
 
 (* ****** ****** *)

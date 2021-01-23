@@ -20,7 +20,7 @@ typedef hdcstlst = List0(hdcst)
 fun fresh_hdvar(string): hdvar
 
 (* ****** ****** *)
- 
+
 abstbox kvar_tbox = ptr
 typedef kvar = kvar_tbox
 
@@ -96,6 +96,34 @@ fun fprint_cfundecl(FILEref, cfundecl): void
 overload print with print_cfundecl
 overload prerr with prerr_cfundecl
 overload fprint with fprint_cfundecl
+
+(* ****** ****** *)
+
+abstbox cvaldecl_tbox = ptr
+typedef cvaldecl = cvaldecl_tbox
+typedef cvaldeclst = List0(cvaldecl)
+
+fun print_cvaldecl(cvaldecl): void
+fun prerr_cvaldecl(cvaldecl): void
+fun fprint_cvaldecl(FILEref, cvaldecl): void
+
+overload print with print_cvaldecl
+overload prerr with prerr_cvaldecl
+overload fprint with fprint_cvaldecl
+
+(* ****** ****** *)
+
+abstbox cvardecl_tbox = ptr
+typedef cvardecl = cvardecl_tbox
+typedef cvardeclst = List0(cvardecl)
+
+fun print_cvardecl(cvardecl): void
+fun prerr_cvardecl(cvardecl): void
+fun fprint_cvardecl(FILEref, cvardecl): void
+
+overload print with print_cvardecl
+overload prerr with prerr_cvardecl
+overload fprint with fprint_cvardecl
 
 (* ****** ****** *)
 
@@ -176,21 +204,14 @@ datatype c0val_node =
 | C0Vfcst of (hdcst)
 | C0Vtcst of (hdcst, htiarg)
 //
-| C0Vfix of // recursive lambda
-( cfundeclst) 
-//
-| C0Vlam_hfarg of // pattern lambda
+| C0Vlam of // lambda
 ( hfarglst(*arg*)
 , kvar(*cont*)
 , c0exp(*body*))
 //
-| C0Vlam_hdcst of // hfundecl lambda
-( hdcstlst(*arg*)
-, kvar(*cont*)
-, c0exp(*body*))
-//
-| C0Vlam_hdvar of // hvardecl lambda
-( hdvarlst(*arg*)
+| C0Vfix of // recursive lambda
+( hdvar(*fid*)
+, hfarglst(*arg*)
 , kvar(*cont*)
 , c0exp(*body*))
 //
@@ -220,6 +241,25 @@ datatype c0exp_node =
 ( c0primop(*primop*)
 , c0valst(*arg*)
 , c0nt(*cont*))
+//
+| C0Efun of
+( cfundeclst
+, c0exp )
+//
+| C0Eimp of
+( hdcst(*nam*)
+, hfarglst(*arg*)
+, kvar(*cont*)
+, c0exp(*bod*)
+, c0exp(*scope*) )
+//
+| C0Elet_val of
+( cvaldeclst
+, c0exp )
+//
+| C0Elet_var of
+( cvardeclst
+, c0exp )
 //
 | C0Eif0 of 
 ( c0val(*subject*)
@@ -265,11 +305,12 @@ overload .label with c0nt_get_label
 (* ****** ****** *)
  
 datatype cfundecl_node = 
-CFUNDECL of  
-@{ nam= hdvar
- , hag= hfarglstopt  
- , knt= kvar
- , def= c0expopt
+CFUNDECL of @{ 
+  nam= hdvar
+, hdc= hdcst 
+, hag= hfarglstopt  
+, knt= kvar
+, def= c0expopt
 }
 
 fun cfundecl_make_node(cfundecl_node): cfundecl 
@@ -278,6 +319,37 @@ fun cfundecl_get_label(cfundecl): int
 
 overload .node with cfundecl_get_node
 overload .label with cfundecl_get_label
+
+(* ****** ****** *)
+
+datatype cvaldecl_node = 
+CVALDECL of @{ 
+  pat= h0pat  
+, def= c0valopt
+}
+
+fun cvaldecl_make_node(cvaldecl_node): cvaldecl 
+fun cvaldecl_get_node(cvaldecl): cvaldecl_node
+fun cvaldecl_get_label(cvaldecl): int
+
+overload .node with cvaldecl_get_node
+overload .label with cvaldecl_get_label
+
+(* ****** ****** *)
+
+datatype cvardecl_node = 
+CVARDECL of @{ 
+, hdv= hdvar  
+, wth= hdvaropt
+, ini= c0valopt
+}
+
+fun cvardecl_make_node(cvardecl_node): cvardecl 
+fun cvardecl_get_node(cvardecl): cvardecl_node
+fun cvardecl_get_label(cvardecl): int
+
+overload .node with cvardecl_get_node
+overload .label with cvardecl_get_label
 
 (* ****** ****** *)
   
@@ -365,6 +437,12 @@ typedef c0valopt_cont = c0valopt -<cloref1> c0exp
 typedef cfundecl_cont = cfundecl -<cloref1> c0exp
 typedef cfundeclst_cont = cfundeclst -<cloref1> c0exp
 
+typedef cvaldecl_cont = cvaldecl -<cloref1> c0exp
+typedef cvaldeclst_cont = cvaldeclst -<cloref1> c0exp
+
+typedef cvardecl_cont = cvardecl -<cloref1> c0exp
+typedef cvardeclst_cont = cvardeclst -<cloref1> c0exp
+
 typedef c0clau_cont = c0clau-<cloref1> c0exp
 typedef c0claulst_cont = c0claulst -<cloref1> c0exp
 
@@ -390,6 +468,22 @@ fun xcps_lfundeclst(lfundeclst, cfundeclst_cont): c0exp
 
 overload xcps with xcps_lfundecl
 overload xcps with xcps_lfundeclst
+
+(* ****** ****** *)
+
+fun xcps_lvaldecl(lvaldecl, cvaldecl_cont): c0exp
+fun xcps_lvaldeclst(lvaldeclst, cvaldeclst_cont): c0exp
+
+overload xcps with xcps_lvaldecl
+overload xcps with xcps_lvaldeclst
+
+(* ****** ****** *)
+
+fun xcps_lvardecl(lvardecl, cvardecl_cont): c0exp
+fun xcps_lvardeclst(lvardeclst, cvardeclst_cont): c0exp
+
+overload xcps with xcps_lvardecl
+overload xcps with xcps_lvardeclst
 
 (* ****** ****** *)
 
@@ -446,8 +540,23 @@ overload fresh with fresh_cfundeclst
  
 (* ****** ****** *)
 
-fun fresh_c0primop(c0primop): c0primop
+fun fresh_cvaldecl(cvaldecl): cvaldecl
+fun fresh_cvaldeclst(cvaldeclst): cvaldeclst
 
+overload fresh with fresh_cvaldecl
+overload fresh with fresh_cvaldeclst
+ 
+(* ****** ****** *)
+
+fun fresh_cvardecl(cvardecl): cvardecl
+fun fresh_cvardeclst(cvardeclst): cvardeclst
+
+overload fresh with fresh_cvardecl
+overload fresh with fresh_cvardeclst
+ 
+(* ****** ****** *)
+
+fun fresh_c0primop(c0primop): c0primop
 overload fresh with fresh_c0primop
 
 (* ****** ****** *)

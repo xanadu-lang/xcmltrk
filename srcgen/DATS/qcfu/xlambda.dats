@@ -139,48 +139,22 @@ case node of
 //
 | H0Eseqn(es, e) =>
   let
-  val pats = 
-  list_vt2t(list_map<h0exp><h0pat>(es))
-  val node = HFARGnpats(~1, pats)
-  val hfarg = hfarg_make_node(loc, node)
-  val hfargs = 
-  list_vt2t(list_make_sing<hfarg>(hfarg))
-  //
   val es = xlambda(es)
   val e = xlambda(e)
-  val f = L0Elam_hfarg(hfargs, e)
   in
-  L0Edapp(f, es)
+  L0Eseqn(es, e)
   end
-  where
-  {
-  implement
-  list_map$fopr<h0exp><h0pat>(e) =
-  let
-  val loc = e.loc()
-  val typ = e.type()
-  val node = H0Pany()
-  in
-  h0pat_make_node(loc, typ, node) 
-  end
-  }
 | H0Elam(knd, arg, body) =>
   let
   val body = xlambda(body)
   in
-  L0Elam_hfarg(arg, body)
+  L0Elam(arg, body)
   end
 | H0Efix(t, fid, arg, body) =>
   let
-  val dcl = LFUNDECL(@{
-    nam= fid
-  , hag= Some(arg)
-  , def= Some(xlambda(body))
-  })
-  val dcls = 
-  list_vt2t(list_make_sing<lfundecl>(dcl))
+  val body = xlambda(body)
   in
-  L0Efix(dcls)
+  L0Efix(fid, arg, body)
   end
 //
 | H0Etry0(t, e, clau) => 
@@ -271,6 +245,14 @@ xlambda(e)
 (* ****** ****** *)
 
 implement
+xlambda_h0expopt(e) =
+case e of
+| Some(e) => Some(xlambda(e))
+| None() => None()
+
+(* ****** ****** *)
+
+implement
 xlambda_h0dclist(dcls, e) =
 list_foldright<h0dcl><l0exp>(dcls, e)
 where
@@ -305,123 +287,69 @@ case node of
   )
 | H0Cfundecl(knd, dec, ht, fdcls) =>
   let
-  val hdc =
-  list_vt2t(list_map<hfundecl><hdcst>(fdcls))
   val fdcls =
   list_vt2t(list_map<hfundecl><lfundecl>(fdcls))
-  val exp = L0Efix(fdcls)
-  val exps =
-  list_vt2t(list_make_sing<l0exp>(exp))
   in
-  L0Edapp(L0Elam_hdcst(hdc, e), exps)
+  L0Efun(fdcls, e)
   end
   where
   {
-  implement
-  list_map$fopr<hfundecl><hdcst>(fdcl) =
-  let
-  val HFUNDECL(hf) = fdcl
-  in
-  hf.hdc
-  end
-  //
-  implement
+  implement 
   list_map$fopr<hfundecl><lfundecl>(fdcl) =
-  let
-  val HFUNDECL(hf) = fdcl
-  val def =
-  case hf.def of
-  | Some(def) => Some(xlambda(def))
-  | None() => None()
-  in
-  LFUNDECL(@{
-    nam= hf.nam
-  , hag= hf.hag 
-  , def= def
-  })
-  end
+  case fdcl of
+  | HFUNDECL(fdcl) =>
+    LFUNDECL@{
+      nam= fdcl.nam    
+    , hdc= fdcl.hdc
+    , hag= fdcl.hag
+    , def= xlambda(fdcl.def)
+    }
   }
 | H0Cvaldecl(t, d, vd) =>
   let
-  val pats = 
-  list_vt2t(list_map<hvaldecl><h0pat>(vd))
-  val defs = 
-  list_vt2t(list_map<hvaldecl><l0exp>(vd))
-  val node = HFARGnpats(~1, pats)
-  val hag = hfarg_make_node(loc, node)
-  val args = 
-  list_vt2t(list_make_sing<hfarg>(hag))
+  val vd =
+  list_vt2t(list_map<hvaldecl><lvaldecl>(vd))
   in
-  L0Edapp(L0Elam_hfarg(args, e), defs)
+  L0Elet_val(vd, e)
+  end
+  where
+  {
+  implement 
+  list_map$fopr<hvaldecl><lvaldecl>(vd) =
+  case vd of
+  | HVALDECL(vd) =>
+    LVALDECL@{
+      pat= vd.pat   
+    , def= xlambda(vd.def)
+    }
+  } 
+| H0Cvardecl(t, d, vd) =>
+  let
+  val vd = 
+  list_vt2t(list_map<hvardecl><lvardecl>(vd))
+  in
+  L0Elet_var(vd, e)
   end
   where
   {
   implement
-  list_map$fopr<hvaldecl><h0pat>(v) =
-  let
-  val HVALDECL(v) = v
-  in
-  v.pat
-  end
-  //
-  implement
-  list_map$fopr<hvaldecl><l0exp>(v) =
-  let
-  val HVALDECL(v) = v
-  val def = v.def
-  in
-  case def of
-  | Some(e) => xlambda(e)
-  | None() => L0Enone0()
-  end
-  }
-| H0Cvardecl(t, d, hv) =>
-  let
-  val vars =
-  list_vt2t(list_map<hvardecl><hdvar>(hv))
-  val exps =
-  list_vt2t(list_map<hvardecl><l0exp>(hv))
-  in
-  L0Edapp(L0Elam_hdvar(vars, e), exps)
-  end
-  where
-  {
-  implement
-  list_map$fopr<hvardecl><hdvar>(v) =
-  let
-  val HVARDECL(v) = v
-  in
-  v.hdv
-  end
-  //
-  implement
-  list_map$fopr<hvardecl><l0exp>(v) =
-  let
-  val HVARDECL(v) = v
-  val ini = v.ini
-  in
-  case ini of
-  | Some(e) => xlambda(e)
-  | None() => L0Enone0()
-  end
+  list_map$fopr<hvardecl><lvardecl>(vd) =
+  case vd of
+  | HVARDECL(vd) =>
+    LVARDECL@{
+      hdv= vd.hdv    
+    , wth= vd.wth
+    , ini= xlambda(vd.ini)
+    }
   }
 //
 | H0Cexcptcon(_) => e
 //
-| H0Cimpdecl3(t, s, d, q, hdc, ta, arg, exp) =>
+| H0Cimpdecl3(t, s, d, q, hdc, ta, hag, exp) =>
   let
   val exp = xlambda(exp)
-  val fexp = 
-  case arg of 
-  | list_cons(_,_) => L0Elam_hfarg(arg, exp)
-  | list_nil() => exp
-  val fexps =
-  list_vt2t(list_make_sing<l0exp>(fexp))
-  //
-  val hdcs = 
-  list_vt2t(list_make_sing<hdcst>(hdc))
   in
-  L0Edapp(L0Elam_hdcst(hdcs, e), fexps)
+  L0Eimp(hdc, hag, exp,  e)
   end
 //
 | H0Cnone1(_) => e

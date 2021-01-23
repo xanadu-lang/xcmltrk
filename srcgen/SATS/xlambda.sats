@@ -10,11 +10,6 @@ XATSOPT_targetloc
 
 (* ****** ****** *)
 
-typedef hdcstopt = Option(hdcst)
-typedef hdcstlst = List0(hdcst)
-
-(* ****** ****** *)
-  
 datatype 
 l0exp =
 | L0Ei00 of (int)
@@ -61,10 +56,14 @@ l0exp =
 //
 | L0Ecase of (int, l0exp, l0claulst) // NOTE: primop
 //
-| L0Efix of (lfundeclst) // recursive lambda
-| L0Elam_hfarg of (hfarglst, l0exp) // pattern lambda
-| L0Elam_hdcst of (hdcstlst, l0exp) // hfundecl lambda
-| L0Elam_hdvar of (hdvarlst, l0exp) // hvardecl lambda
+| L0Eseqn of (l0explst, l0exp)
+//
+| L0Elam of (hfarglst, l0exp)
+| L0Efix of (hdvar, hfarglst, l0exp)
+| L0Efun of (lfundeclst, l0exp)
+| L0Eimp of (hdcst, hfarglst, l0exp, l0exp)
+| L0Elet_val of (lvaldeclst, l0exp)
+| L0Elet_var of (lvardeclst, l0exp) 
 //
 | L0Etry0 of (token, l0exp, l0claulst) // NOTE: primop
 //
@@ -87,10 +86,25 @@ l0exp =
 | L0Enone1 of (dataptr)
 
 and lfundecl = 
-LFUNDECL of
-@{ nam= hdvar
- , hag= hfarglstopt
- , def= l0expopt }
+LFUNDECL of @{ 
+  nam= hdvar
+, hdc= hdcst
+, hag= hfarglstopt
+, def= l0expopt 
+}
+
+and lvaldecl =
+LVALDECL of @{
+  pat= h0pat  
+, def= l0expopt
+}
+
+and lvardecl =
+LVARDECL of @{
+, hdv= hdvar  
+, wth= hdvaropt
+, ini= l0expopt
+}
 
 and l0clau =
 | L0CLAUpat of (l0gpat)
@@ -107,6 +121,8 @@ and l0gua =
 where l0explst = List0(l0exp)
 and l0expopt = Option(l0exp)
 and lfundeclst = List0(lfundecl)
+and lvaldeclst = List0(lvaldecl)
+and lvardeclst = List0(lvardecl)
 and l0claulst = List0(l0clau)
 and l0gualst = List0(l0gua)
 
@@ -129,6 +145,26 @@ fun fprint_lfundecl(FILEref, lfundecl): void
 overload print with print_lfundecl
 overload prerr with prerr_lfundecl
 overload fprint with fprint_lfundecl
+
+(* ****** ****** *)
+
+fun print_lvaldecl(lvaldecl): void
+fun prerr_lvaldecl(lvaldecl): void
+fun fprint_lvaldecl(FILEref, lvaldecl): void
+
+overload print with print_lvaldecl
+overload prerr with prerr_lvaldecl
+overload fprint with fprint_lvaldecl
+
+(* ****** ****** *)
+
+fun print_lvardecl(lvardecl): void
+fun prerr_lvardecl(lvardecl): void
+fun fprint_lvardecl(FILEref, lvardecl): void
+
+overload print with print_lvardecl
+overload prerr with prerr_lvardecl
+overload fprint with fprint_lvardecl
 
 (* ****** ****** *)
 
@@ -166,9 +202,12 @@ fun
 xlambda_h0exp(h0exp): l0exp
 fun 
 xlambda_h0explst(h0explst): l0explst
+fun 
+xlambda_h0expopt(h0expopt): l0expopt
 
 overload xlambda with xlambda_h0exp
 overload xlambda with xlambda_h0explst
+overload xlambda with xlambda_h0expopt
 
 (* ****** ****** *)
 

@@ -13,6 +13,7 @@ XCMLTRK=$(XCMLTRKD)/bin/xcmltrk
 all:: \
 test-2021-01-05 \
 test-2021-01-22 \
+test-2021-01-23 \
 ######
 testall:: all
 testall:: cleanall
@@ -24,6 +25,10 @@ $(XCMLTRK) \
 test-2021-01-22: ; \
 $(XCMLTRK) \
 -d test-2021-01-22.dats > test-2021-01-22.log \
+######
+test-2021-01-23: ; \
+$(XCMLTRK) \
+-d test-2021-01-23.dats > test-2021-01-23.log \
 ######
 clean:: ; $(RMF) *~
 ######

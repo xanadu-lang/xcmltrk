@@ -8,6 +8,9 @@ case opt of
 | some(_) => true
 | none() => false
 
+val test = option2bool(none())
+val test = test
+
 (* ****** ****** *)
 
 (* end of [test-2021-01-22.dats] *)

@@ -45,6 +45,12 @@ implement
 fprint_val<cfundecl> = fprint_cfundecl
 
 implement
+fprint_val<cvaldecl> = fprint_cvaldecl
+
+implement
+fprint_val<cvardecl> = fprint_cvardecl
+
+implement
 fprint_val<c0primop> = fprint_c0primop
 
 implement
@@ -127,14 +133,10 @@ case node of
 | C0Vtcst(cst, ht) =>
   fprint!(fp, "C0Vtcst(", cst, ", ", ht, ")")
 //
-| C0Vfix(fdcl) =>
-  fprint!(fp, "C0Vfix(", fdcl, ")")
-| C0Vlam_hfarg(hag, k, e) =>
-  fprint!(fp, "C0Vlam_hfarg(", hag, ", ", k, ", ", e, ")")
-| C0Vlam_hdcst(hdc, k, e) =>
-  fprint!(fp, "C0Vlam_hdcst(", hdc, ", ", k, ", ", e, ")")
-| C0Vlam_hdvar(hdv, k, e) =>
-  fprint!(fp, "C0Vlam_hdvar(", hdv, ", ", k, ", ", e, ")")
+| C0Vlam(hag, k, e) =>
+  fprint!(fp, "C0Vlam([", hag, "], ", k, ", ", e, ")")
+| C0Vfix(fid, hag, k, e) =>
+  fprint!(fp, "C0Vfix(", fid, ", [", hag, "], ", k, ", ", e, ")")
 //
 | C0Vnone0() =>
   fprint!(fp, "C0Vnone0()")
@@ -159,12 +161,27 @@ in
 case node of
 | C0Eret(c, v) =>
   fprint!(fp, "C0Eret(", c, ", ", v, ")")
+//
 | C0Edapp(f, arg, k) =>
   fprint!(fp, "C0Edapp(", f, ", [", arg, "], ", k, ")")
+//
 | C0Eprimop(prim, arg, k) =>
   fprint!(fp, "C0Eprimop(", prim, ", [", arg, "], ", k, ")")
+//
+| C0Efun(fdcl, e) =>
+  fprint!(fp, "C0Efun([", fdcl, "], ", e, ")")
+| C0Eimp(hdc, hag, k, bod, e) =>
+  fprint!(fp, 
+  "C0Eimp(", hdc, ", [", hag, "], ", k, ", ", bod, ", ", e, ")")
+//
+| C0Elet_val(ldcl, e) =>
+  fprint!(fp, "C0Elet_val([", ldcl, "], ", e, ")")
+| C0Elet_var(ldcl, e) =>
+  fprint!(fp, "C0Elet_var([", ldcl, "], ", e, ")")
+//
 | C0Eif0(v, k1, k2) =>
   fprint!(fp, "C0Eif0(", v, ", ", k1, ", ", k2, ")")
+//
 | C0Ecase(i, v, vs, k) =>
   fprint!(fp, "C0Ecase(", i, ", ", v, ", [", vs, "], ", k, ")")
 | C0Etry0(t, v, vs, k) =>
@@ -227,6 +244,53 @@ case fdcl.hag of
   , "nam=", fdcl.nam, ", "
   , "knt=", fdcl.knt, ", "
   , "def=", fdcl.def, "}")
+end
+
+(* ****** ****** *)
+
+implement
+print_cvaldecl(ldcl) =
+fprint!(stdout_ref, ldcl)
+
+implement
+prerr_cvaldecl(ldcl) =
+fprint!(stderr_ref, ldcl)
+
+implement
+fprint_cvaldecl(fp, ldcl) =
+let
+val node = ldcl.node()
+val CVALDECL(ldcl) = node
+in
+fprint!
+( fp
+, "CVALDECL@{" 
+, "pat=", ldcl.pat, ", "
+, "def=", ldcl.def, "}")
+end
+
+(* ****** ****** *)
+
+implement
+print_cvardecl(ldcl) =
+fprint!(stdout_ref, ldcl)
+
+implement
+prerr_cvardecl(ldcl) =
+fprint!(stderr_ref, ldcl)
+
+implement
+fprint_cvardecl(fp, ldcl) =
+let
+val node = ldcl.node()
+val CVARDECL(ldcl) = node
+in
+fprint!
+( fp
+, "CVARDECL@{" 
+, "hdv=", ldcl.hdv, ", "
+, "wth=", ldcl.wth, ", "
+, "ini=", ldcl.ini, "}")
 end
 
 (* ****** ****** *)

@@ -164,6 +164,50 @@ x.label
 (* ****** ****** *)
 
 absimpl 
+cvaldecl_tbox = '{
+  node= cvaldecl_node  
+, label= int
+}
+
+implement
+cvaldecl_make_node(node) = '{
+  node= node
+, label= ~1
+}
+
+implement
+cvaldecl_get_node(x) =
+x.node
+
+implement
+cvaldecl_get_label(x) =
+x.label
+  
+(* ****** ****** *)
+
+absimpl 
+cvardecl_tbox = '{
+  node= cvardecl_node  
+, label= int
+}
+
+implement
+cvardecl_make_node(node) = '{
+  node= node
+, label= ~1
+}
+
+implement
+cvardecl_get_node(x) =
+x.node
+
+implement
+cvardecl_get_label(x) =
+x.label
+  
+(* ****** ****** *)
+
+absimpl 
 c0primop_tbox =  '{
   node= c0primop_node  
 , label= int
@@ -414,36 +458,75 @@ case e of
   c0exp_make_node(C0Ecase(i, e, cs, k))
   end))
 //
-| L0Efix(fdcl) =>
-  xcps(fdcl, lam(fdcl) =<cloref1>
-  c(c0val_make_node(C0Vfix(fdcl))))
-| L0Elam_hfarg(a, e) =>
+| L0Eseqn(es, e) =>
+  xcps(es, lam(es) =<cloref1> 
+  xcps(e, lam(e) =<cloref1> c(e)))
+//
+| L0Elam(hag, e) =>
   let
   val k = fresh_kvar("k")
   val bod =
   xcps(e, lam(e) =<cloref1> 
   c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e)))
   in
-  c(c0val_make_node(C0Vlam_hfarg(a, k, bod)))
+  c(c0val_make_node(C0Vlam(hag, k, bod)))
   end
-| L0Elam_hdcst(a, e) =>
+| L0Efix(fid, hag, e) =>
   let
   val k = fresh_kvar("k")
   val bod =
   xcps(e, lam(e) =<cloref1> 
   c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e)))
   in
-  c(c0val_make_node(C0Vlam_hdcst(a, k, bod)))
+  c(c0val_make_node(C0Vfix(fid, hag, k, bod)))
   end
-| L0Elam_hdvar(a, e) =>
+| L0Efun(fdcl, e) =>
+  let
+  val fdcl = 
+  list_vt2t(list_map<lfundecl><cfundecl>(fdcl))
+  in
+  c0exp_make_node(C0Efun(fdcl, xcps(e, c)))
+  end
+  where
+  {
+  implement
+  list_map$fopr<lfundecl><cfundecl>(fdcl) =
+  case fdcl of
+  | LFUNDECL(fdcl) =>
+    let
+    val k = fresh_kvar("k")
+    val def = 
+    case fdcl.def of
+    | Some(def) =>
+      Some(xcps(def, lam(e) =<cloref1>
+      c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e))))
+    | None() => None()
+    in
+    cfundecl_make_node(CFUNDECL@{
+      nam= fdcl.nam
+    , hdc= fdcl.hdc  
+    , hag= fdcl.hag
+    , knt= k
+    , def= def
+    })
+    end
+  }
+| L0Eimp(hdc, hag, bod, e) =>
+  // TODO: arg-less implements
   let
   val k = fresh_kvar("k")
   val bod =
-  xcps(e, lam(e) =<cloref1> 
-  c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e)))
+  xcps(bod, lam(bod) =<cloref1> 
+  c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), bod)))
   in
-  c(c0val_make_node(C0Vlam_hdvar(a, k, bod)))
+  c0exp_make_node(C0Eimp(hdc, hag, k, bod, xcps(e, c)))
   end
+| L0Elet_val(ldcl, e) =>
+  xcps(ldcl, lam(ldcl) =<cloref1> 
+  c0exp_make_node(C0Elet_val(ldcl, xcps(e, c))))
+| L0Elet_var(ldcl, e) =>
+  xcps(ldcl, lam(ldcl) =<cloref1> 
+  c0exp_make_node(C0Elet_var(ldcl, xcps(e, c))))
 //
 | L0Etry0(t, e, cs) =>
   xcps(e, lam(e) =<cloref1>
@@ -616,25 +699,22 @@ case e of
 implement
 xcps_lfundecl(fdcl, c) =
 let
-val k = fresh_kvar("k")
-//
 val LFUNDECL(fdcl) = fdcl
-val nam = fdcl.nam
-val hag = fdcl.hag
+val k = fresh_kvar("k")
 val e = 
 case fdcl.def of
 | Some(e) =>
   Some(xcps(e, lam(e) =<cloref1> 
   c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e))))
 | None() => None()
-//
 in
-c(cfundecl_make_node(CFUNDECL(@{
-  nam= nam  
-, hag= hag
+c(cfundecl_make_node(CFUNDECL@{
+  nam= fdcl.nam  
+, hdc= fdcl.hdc
+, hag= fdcl.hag
 , knt= k
 , def= e
-})))
+}))
 end
 
 (* ****** ****** *)
@@ -646,8 +726,58 @@ case fdclst of
   xcps_lfundecl(fdcl, lam(fdcl) =<cloref1>
   xcps_lfundeclst(fdclst, lam(fdclst) =<cloref1>
   c(list_cons(fdcl, fdclst))))
-| list_nil() =>
-  c(list_nil())
+| list_nil() => c(list_nil())
+
+(* ****** ****** *)
+
+implement
+xcps_lvaldecl(ldcl, c) =
+let
+val LVALDECL(ldcl) = ldcl
+in
+xcps(ldcl.def, lam(def) =<cloref1> 
+c(cvaldecl_make_node(CVALDECL@{
+  pat= ldcl.pat
+, def= def
+})))
+end
+
+(* ****** ****** *)
+
+implement
+xcps_lvaldeclst(ldclst, c) =
+case ldclst of
+| list_cons(ldcl, ldclst) =>
+  xcps_lvaldecl(ldcl, lam(ldcl) =<cloref1>
+  xcps_lvaldeclst(ldclst, lam(ldclst) =<cloref1>
+  c(list_cons(ldcl, ldclst))))
+| list_nil() => c(list_nil())
+
+(* ****** ****** *)
+
+implement
+xcps_lvardecl(ldcl, c) =
+let
+val LVARDECL(ldcl) = ldcl
+in
+xcps(ldcl.ini, lam(ini) =<cloref1> 
+c(cvardecl_make_node(CVARDECL@{
+  hdv= ldcl.hdv
+, wth= ldcl.wth
+, ini= ini
+})))
+end
+
+(* ****** ****** *)
+
+implement
+xcps_lvardeclst(ldclst, c) =
+case ldclst of
+| list_cons(ldcl, ldclst) =>
+  xcps_lvardecl(ldcl, lam(ldcl) =<cloref1>
+  xcps_lvardeclst(ldclst, lam(ldclst) =<cloref1>
+  c(list_cons(ldcl, ldclst))))
+| list_nil() => c(list_nil())
 
 (* ****** ****** *)
 
@@ -768,17 +898,11 @@ case v.node() of
 | C0Vfcst(_) => v.node()
 | C0Vtcst(_,_) => v.node()
 //
-| C0Vfix(fdcl) => 
-  C0Vfix(fresh(fdcl))
+| C0Vlam(hag, k, e) =>
+  C0Vlam(hag, k, fresh(e))
 //
-| C0Vlam_hfarg(hag, k, e) =>
-  C0Vlam_hfarg(hag, k, fresh(e))
-//
-| C0Vlam_hdcst(cst, k, e) =>
-  C0Vlam_hdcst(cst, k, fresh(e))
-//
-| C0Vlam_hdvar(hdv, k, e) =>
-  C0Vlam_hdvar(hdv, k, fresh(e))
+| C0Vfix(fid, hag, k, e) =>
+  C0Vfix(fid, hag, k, fresh(e))
 //
 | C0Vnone0() => v.node()
 | C0Vnone1(_) => v.node()
@@ -809,6 +933,14 @@ case e.node() of
   C0Edapp(fresh(v), fresh(vs), fresh(k))
 | C0Eprimop(p, vs, ks) =>
   C0Eprimop(fresh(p), fresh(vs), fresh(ks))
+| C0Efun(fdcl, e) =>
+  C0Efun(fresh(fdcl), fresh(e))
+| C0Eimp(nam, hag, k, bod, e) =>
+  C0Eimp(nam, hag, k, fresh(bod), fresh(e))
+| C0Elet_val(ldcl, e) =>
+  C0Elet_val(fresh(ldcl), fresh(e))
+| C0Elet_var(ldcl, e) =>
+  C0Elet_var(fresh(ldcl), fresh(e))
 | C0Eif0(v, k1, k2) =>
   C0Eif0(fresh(v), fresh(k1), fresh(k2))
 | C0Ecase(i, v, cs, k) =>
@@ -863,6 +995,7 @@ case fdcl.node() of
 | CFUNDECL(fdcl) =>
   CFUNDECL(@{
     nam= fdcl.nam
+  , hdc= fdcl.hdc
   , hag= fdcl.hag
   , knt= fdcl.knt
   , def= 
@@ -883,6 +1016,66 @@ implement
 list_map$fopr<cfundecl><cfundecl>(fdcl) =
 fresh(fdcl)
 }
+
+(* ****** ****** *)
+
+implement
+fresh_cvaldecl(ldcl) =
+let
+val node =
+case ldcl.node() of
+| CVALDECL(ldcl) =>
+  CVALDECL(@{
+    pat= ldcl.pat
+  , def= 
+    case ldcl.def of
+    | Some(def) => Some(fresh(def))
+    | None() => None()
+  })
+in
+'{ node= node, label= fresh_label() }
+end
+
+implement
+fresh_cvaldeclst(ldcl) =
+list_vt2t(list_map<cvaldecl><cvaldecl>(ldcl))
+where
+{
+implement
+list_map$fopr<cvaldecl><cvaldecl>(ldcl) =
+fresh(ldcl)
+}
+
+(* ****** ****** *)
+
+implement
+fresh_cvardecl(ldcl) =
+let
+val node =
+case ldcl.node() of
+| CVARDECL(ldcl) =>
+  CVARDECL(@{
+    hdv= ldcl.hdv
+  , wth= ldcl.wth
+  , ini= 
+    case ldcl.ini of
+    | Some(ini) => Some(fresh(ini))
+    | None() => None()
+  })
+in
+'{ node= node, label= fresh_label() }
+end
+
+implement
+fresh_cvardeclst(ldcl) =
+list_vt2t(list_map<cvardecl><cvardecl>(ldcl))
+where
+{
+implement
+list_map$fopr<cvardecl><cvardecl>(ldcl) =
+fresh(ldcl)
+}
+
 
 (* ****** ****** *)
 
