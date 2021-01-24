@@ -313,9 +313,9 @@ datatype cfundecl_node =
 CFUNDECL of @{ 
   nam= hdvar
 , hdc= hdcst 
-, hag= hfarglstopt  
+, hag= hfarglst
 , knt= kdvar
-, def= c0expopt
+, def= c0exp
 }
 
 fun cfundecl_make_node(cfundecl_node): cfundecl 
@@ -468,10 +468,7 @@ overload xcps with xcps_l0expopt
 
 (* ****** ****** *)
 
-fun xcps_lfundecl(lfundecl, cfundecl_cont): c0exp
 fun xcps_lfundeclst(lfundeclst, cfundeclst_cont): c0exp
-
-overload xcps with xcps_lfundecl
 overload xcps with xcps_lfundeclst
 
 (* ****** ****** *)

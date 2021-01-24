@@ -481,36 +481,8 @@ case e of
   c(c0val_make_node(C0Vfix(fid, hag, k, bod)))
   end
 | L0Efun(fdcl, e) =>
-  let
-  val fdcl = 
-  list_vt2t(list_map<lfundecl><cfundecl>(fdcl))
-  in
-  c0exp_make_node(C0Efun(fdcl, xcps(e, c)))
-  end
-  where
-  {
-  implement
-  list_map$fopr<lfundecl><cfundecl>(fdcl) =
-  case fdcl of
-  | LFUNDECL(fdcl) =>
-    let
-    val k = fresh_kdvar("k")
-    val def = 
-    case fdcl.def of
-    | Some(def) =>
-      Some(xcps(def, lam(e) =<cloref1>
-      c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e))))
-    | None() => None()
-    in
-    cfundecl_make_node(CFUNDECL@{
-      nam= fdcl.nam
-    , hdc= fdcl.hdc  
-    , hag= fdcl.hag
-    , knt= k
-    , def= def
-    })
-    end
-  }
+  xcps(fdcl, lam(fdcl) =<cloref1> 
+  c0exp_make_node(C0Efun(fdcl, xcps(e, c))))
 | L0Eimp_fun(hdc, hag, bod, e) =>
   let
   val k = fresh_kdvar("k")
@@ -699,35 +671,41 @@ case e of
 (* ****** ****** *)
 
 implement
-xcps_lfundecl(fdcl, c) =
-let
-val LFUNDECL(fdcl) = fdcl
-val k = fresh_kdvar("k")
-val e = 
-case fdcl.def of
-| Some(e) =>
-  Some(xcps(e, lam(e) =<cloref1> 
-  c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e))))
-| None() => None()
-in
-c(cfundecl_make_node(CFUNDECL@{
-  nam= fdcl.nam  
-, hdc= fdcl.hdc
-, hag= fdcl.hag
-, knt= k
-, def= e
-}))
-end
-
-(* ****** ****** *)
-  
-implement
 xcps_lfundeclst(fdclst, c) =
 case fdclst of
 | list_cons(fdcl, fdclst) =>
-  xcps_lfundecl(fdcl, lam(fdcl) =<cloref1>
-  xcps_lfundeclst(fdclst, lam(fdclst) =<cloref1>
-  c(list_cons(fdcl, fdclst))))
+  let
+  val LFUNDECL(fdcl) = fdcl
+  val k = fresh_kdvar("k")
+  in
+  case (fdcl.hag, fdcl.def) of
+  | (Some(hag), Some(def)) =>
+    let
+    val def = xcps(def, lam(e) =<cloref1> 
+    c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e)))
+    val fdcl = cfundecl_make_node(CFUNDECL@{
+      nam= fdcl.nam  
+    , hdc= fdcl.hdc
+    , hag= hag
+    , knt= k
+    , def= def
+    })
+    in
+    xcps_lfundeclst(fdclst, lam(fdclst) =<cloref1>
+    c(list_cons(fdcl, fdclst)))
+    end
+  | (Some(hag), None()) =>
+    xcps_lfundeclst(fdclst, lam(fdclst) =<cloref1>
+    c(fdclst))
+  | (None(), Some(def)) =>
+    xcps_l0exp(def, lam(e) =<cloref1>
+    c0exp_make_node(C0Eimp_val(fdcl.hdc, e,
+    xcps_lfundeclst(fdclst, lam(fdclst) =<cloref1> 
+    c(fdclst)))))
+  | (None(), None()) =>
+    xcps_lfundeclst(fdclst, lam(fdclst) =<cloref1>
+    c(fdclst))
+  end
 | list_nil() => c(list_nil())
 
 (* ****** ****** *)
@@ -1002,10 +980,7 @@ case fdcl.node() of
   , hdc= fdcl.hdc
   , hag= fdcl.hag
   , knt= fdcl.knt
-  , def= 
-    case fdcl.def of
-    | Some(def) => Some(fresh(def))
-    | None() => None()
+  , def= fdcl.def
   })
 in
 '{ node= node, label= fresh_label() }
