@@ -2,8 +2,6 @@
 "share/xatsopt_prelude.hats"
 (* ****** ****** *)
 
-#extern
-fun foo(): void
-
-implement
-foo() = foo()
+fun foo1() = foo2()
+and foo2() = foo1()
+and foo3 = 1

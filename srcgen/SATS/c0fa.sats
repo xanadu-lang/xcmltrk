@@ -12,85 +12,121 @@ XATSOPT_targetloc
 
 (* ****** ****** *)
 
-abstbox kset_tbox = ptr
-typedef kset = kset_tbox
+abstbox K_tbox = ptr
+typedef K = K_tbox
 
-abstbox vset_tbox = ptr
-typedef vset = vset_tbox
-
-datatype k_elem =
-| K0NT of (hdvar, c0exp)
-
-datatype v_elem = 
-| V0lam_harg
+abstbox V_tbox = ptr
+typedef V = V_tbox
 
 (* ****** ****** *)
 
-abstbox c0cache_tbox = ptr
-typedef c0cache = c0cache_tbox
+abstbox set_tbox(a:t0p) = ptr
+typedef set(a:t0p) = set_tbox(a:t0p)
+typedef setlst(a:t0p) = List0(set(a))
+
+fun {a:t0p}set_empty(): set(a)
+fun {a:t0p}set_sing(a): set(a)
+fun {a:t0p}set_extend(set(a), a): set(a)
+fun {a:t0p}set_union(set(a), set(a)): set(a)
+fun {a:t0p}setlst_union(setlst(a)): set(a)
+
+overload .extend with set_extend
+overload union with set_union
+overload union with setlst_union
+
+fun {a:t0p}{b:t0p}set_fold(set(a), b): b
+fun {a:t0p}{b:t0p}set_fold$fopr(a, b): b
 
 (* ****** ****** *)
 
-abstbox c0set_tbox = ptr
-typedef c0set = c0set_tbox
-typedef c0setlst = List0(c0set)
+abstbox cache_tbox(a:t0p) = ptr
+typedef cache(a:t0p) = cache_tbox(a:t0p)
+
+fun {a:t0p}cache_empty(): cache(a)
+fun {a:t0p}cache_sing(int, set(a)): cache(a)
+fun {a:t0p}cache_extend(cache(a), int, set(a)): cache(a)
+fun {a:t0p}cache_union(cache(a), cache(a)): cache(a)
+
+overload .extend with cache_extend
+overload union with cache_union
 
 (* ****** ****** *)
+
+abstbox env_tbox(a:t0p,b:t0p) = ptr
+typedef env(a:t0p,b:t0p) = env_tbox(a,b)
+
+fun {a:t0p}{b:t0p}env_empty(): env(a,b)
+fun {a:t0p}{b:t0p}env_extend(env(a,b), a, set(b)): env(a,b)
+fun {a:t0p}{b:t0p}env_union(env(a,b), env(a,b)): env(a,b)
+
+overload .extend with env_extend
+overload union with env_union
+
+fun {a:t0p}{b:t0p}env_lookup(env(a,b), a): set(b)
+overload .lookup with env_lookup
+
+(* ****** ****** *)
+
+datatype K_node = // continuation nodes
+| EC0NT of (hdvar, c0exp)
+
+datatype V_node = // user nodes
+| E0con of (hdcon, setlst(V))
+| E0lam of (hfarglst, kdvar, c0exp)
+| E0fix of (hdvar, hfarglst, kdvar, c0exp)
+| E0imp of (hdcst, hfarglst, kdvar, c0exp)
+| E0fun of (hdvar, hdcst, hfarglst, kdvar, c0exp)
+
+fun K_make_node(K_node, int(*label*)): K
+fun V_make_node(V_node, int(*label*)): V
+
+fun K_get_node(K): K_node
+fun V_get_node(V): V_node
+
+overload .node with K_get_node
+overload .node with V_get_node
+
+fun K_get_label(K): int
+fun V_get_label(V): int
+
+overload .label with K_get_label
+overload .label with V_get_label
+
+(* ****** ****** *)
+
+typedef c0env = @{
+  hdv= env(hdvar, V)
+, hdc= env(hdcst, V)
+, kvr= env(kdvar, K)
+}
+
+fun c0env_hfarglst(c0env, hfarglst, setlst(V)): c0env
+
+(* ****** ****** *)
+
+fun c0fa(c0exp, c0env): cache(V)
+
+fun c0fa_c0val(c0val, c0env): set(V)
+fun c0fa_c0nt(c0nt, c0env): set(K)
+
+fun 
+c0fa_ret // continuation application
+( set(K) // continuation set
+, set(V) // argument set
+, c0env // environment
+): cache(V)
  
-abstbox c0venv_tbox
-typedef c0venv = c0venv_tbox
-
-(* ****** ****** *)
-
-fun c0cache_empty(): c0cache
-fun c0cache_extend(c0cache, int(*label*), c0set): c0cache
-fun c0cache_lookup(c0cache, int): c0set
-fun c0cache_union(c0cache, c0cache): c0cache
-
-overload .extend with c0cache_extend
-overload .lookup with c0cache_lookup
-overload union with c0cache_union
-
-(* ****** ****** *)
-
-fun c0set_empty(): c0set
-fun c0set_sing(c0triv): c0set
-fun c0set_extend(c0set, c0triv): c0set
-fun c0set_union(c0set, c0set): c0set
-
-overload .extend with c0set_extend
-overload union with c0set_union
-
-(* ****** ****** *)
+fun 
+c0fa_dapp
+( set(V) // function set
+, setlst(V) // argument set
+, set(K) // continuation set
+, c0env // environment set
+): cache(V)
  
-fun c0venv_empty(): c0venv
-fun c0venv_extend_hdvar(c0venv, hdvar, c0triv): c0venv
-fun c0venv_extend_hdcst(c0venv, hdcst, c0triv): c0venv
-fun c0venv_lookup_hdvar(c0venv, hdvar): c0set
-fun c0venv_lookup_hdcst(c0venv, hdcst): c0set
-fun c0venv_lookup_kvar(c0venv, kvar): c0set
-
-overload .extend with c0venv_extend_hdvar
-overload .extend with c0venv_extend_hdcst
-overload .lookup with c0venv_lookup_hdvar
-overload .lookup with c0venv_lookup_hdcst
-overload .lookup with c0venv_lookup_kvar
-
-(* ****** ****** *)
-
-fun c0fa_c0val_1(c0val, c0venv): c0set // function position
-fun c0fa_c0val_n(c0val, c0venv): c0setlst // argument position
-fun c0fa_c0valst(c0valst, c0venv): c0setlst // argument position
-fun c0fa_c0nt(c0nt, c0venv): c0set
-fun c0fa_c0clau(c0clau, c0venv): c0set
-fun c0fa_c0claulst(c0claulst, c0venv): c0setlst
-fun c0fa_c0exp(c0exp, c0venv): c0cache 
-
-fun c0fa_C0Eret(c0set, c0set, c0venv): c0cache
-fun c0fa_C0Edapp(c0set, c0setlst, c0set, c0venv): c0cache
-fun c0fa_C0Eprimop(c0primop, c0setlst, c0set, c0venv): c0cache
-fun c0fa_C0Ecase(c0set, c0setlst, c0set, c0venv): c0cache
-fun c0fa_C0Etry0(c0set, c0setlst, c0set, c0venv): c0cache
+(* fun c0fa_C0Eprimop(c0primop, c0setlst, c0set, c0venv): c0cache *)
+(* fun c0fa_C0Ecase(c0set, c0setlst, c0set, c0venv): c0cache *)
+(* fun c0fa_C0Etry0(c0set, c0setlst, c0set, c0venv): c0cache *)
 
 // NOTE: call cache does not need to record continuation
 // TODO: stratified sets for continuations and functions

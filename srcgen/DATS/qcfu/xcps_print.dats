@@ -231,13 +231,22 @@ let
 val node = fdcl.node()
 val CFUNDECL(fdcl) = node
 in
-fprint!
-( fp
-, "CFUNDECL@{" 
-, "nam=", fdcl.nam, ", "
-, "hag=", fdcl.hag, ", "
-, "knt=", fdcl.knt, ", "
-, "def=", fdcl.def, "}")
+case fdcl.hag of
+| Some(hag) =>
+  fprint!
+  ( fp
+  , "CFUNDECL@{" 
+  , "nam=", fdcl.nam, ", "
+  , "hag=", hag, ", "
+  , "knt=", fdcl.knt, ", "
+  , "def=", fdcl.def, "}")
+| None() =>
+  fprint!
+  ( fp
+  , "CFUNDECL@{" 
+  , "nam=", fdcl.nam, ", "
+  , "knt=", fdcl.knt, ", "
+  , "def=", fdcl.def, "}")
 end
 
 (* ****** ****** *)

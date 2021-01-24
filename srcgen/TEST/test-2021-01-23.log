@@ -1,7 +1,6 @@
 H0Cinclude(src= G1Estr(STRING_closed("share/xatsopt_prelude.hats")); knd= 1; Some(/Users/qianchengfu/ATS-lang/ATS-Xanadu/share/xatsopt_prelude.hats); Some(<hdcls>))
-H0Cextern(#EXTERN; H0Cfundecl(FUN(FNKfn1); DECMODnone(); ; HFUNDECL@{nam=foo(0), hdc=foo(0), }))
-H0Cimpdecl3(IMPLMNT(IMPgen); 908; DECMODnone(); None(); foo(0); HTIARGnone(); HFARGnpats(-1; ); H0Edapp(H0Efcst(foo(0)); -1; ))
+H0Cfundecl(FUN(FNKfn1); DECMODnone(); ; HFUNDECL@{nam=foo1(0), hdc=foo1(0), hag=HFARGnpats(-1; ), def=Some(H0Edapp(H0Evknd(-1; foo2(1)); -1; )), rtp=H0Tnone1(...), }, HFUNDECL@{nam=foo2(1), hdc=foo2(1), hag=HFARGnpats(-1; ), def=Some(H0Edapp(H0Evknd(-1; foo1(0)); -1; )), rtp=H0Tnone1(...), }, HFUNDECL@{nam=foo3(2), hdc=foo3(2), hag=, def=Some(H0Eint(INT1(1))), rtp=H0Tnone1(...), })
 
-L0Edapp(L0Elam_hdcst(foo(0), L0Edapp(L0Elam_hdcst(foo(0), L0Enone0()), L0Elam_hfarg(HFARGnpats(-1; ), L0Edapp(L0Efcst(foo(0)), )))), L0Efix(LFUNDECL@{nam=foo(0), def=None()}))
+L0Efun([LFUNDECL@{nam=foo1(0), hag=HFARGnpats(-1; ), def=Some(L0Edapp(L0Evknd(-1, foo2(1)), ))}, LFUNDECL@{nam=foo2(1), hag=HFARGnpats(-1; ), def=Some(L0Edapp(L0Evknd(-1, foo1(0)), ))}, LFUNDECL@{nam=foo3(2), hag=, def=Some(L0Eint(INT1(1)))}], L0Enone0())
 
-C0Edapp(C0Vlam_hdcst(foo(0), k(0), C0Edapp(C0Vlam_hdcst(foo(0), k(1), C0Eret(C0VAR(k(1)), C0Vnone0())), [C0Vlam_hfarg(HFARGnpats(-1; ), k(2), C0Edapp(C0Vfcst(foo(0)), [], C0NT(x(1), C0Eret(C0VAR(k(2)), C0Vvar(x(1))))))], C0NT(x(2), C0Eret(C0VAR(k(0)), C0Vvar(x(2)))))), [C0Vfix(CFUNDECL@{nam=foo(0), knt=k(3), def=None()})], C0NT(x(3), C0Eret(C0HALT(), C0Vvar(x(3)))))
+C0Efun([CFUNDECL@{nam=foo1(0), hag=HFARGnpats(-1; ), knt=k(0), def=Some(C0Edapp(C0Vvnd(-1, foo2(1)), [], C0NT(x(3), C0Eret(C0VAR(k(0)), C0Vvar(x(3))))))}, CFUNDECL@{nam=foo2(1), hag=HFARGnpats(-1; ), knt=k(1), def=Some(C0Edapp(C0Vvnd(-1, foo1(0)), [], C0NT(x(4), C0Eret(C0VAR(k(1)), C0Vvar(x(4))))))}, CFUNDECL@{nam=foo3(2), hag=, knt=k(2), def=Some(C0Eret(C0VAR(k(2)), C0Vint(INT1(1))))}], C0Eret(C0HALT(), C0Vnone0()))
