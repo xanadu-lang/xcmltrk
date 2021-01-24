@@ -32,27 +32,27 @@ end
 (* ****** ****** *)
 
 typedef 
-kvar_struct = @{
+kdvar_struct = @{
   nam= string  
 , stamp= int
 }
 
 absimpl 
-kvar_tbox = ref(kvar_struct)
+kdvar_tbox = ref(kdvar_struct)
 
 local
 
-val kvar_stamp = ref<int>(0)
+val kdvar_stamp = ref<int>(0)
 
 in
 
 implement
-fresh_kvar(s) =
+fresh_kdvar(s) =
 let
-val n = kvar_stamp[]
-val () = kvar_stamp[] := n + 1
+val n = kdvar_stamp[]
+val () = kdvar_stamp[] := n + 1
 in
-ref<kvar_struct>
+ref<kdvar_struct>
 @{
   nam= s  
 , stamp= n
@@ -60,15 +60,15 @@ ref<kvar_struct>
 end
 
 implement
-tostring_kvar(k) =
+tostring_kdvar(k) =
 k->nam
 
 implement
-tostamp_kvar(k) =
+tostamp_kdvar(k) =
 k->stamp
 
 implement 
-eq_kvar(k1, k2) =
+eq_kdvar(k1, k2) =
 k1->stamp = k2->stamp
  
 end
@@ -464,7 +464,7 @@ case e of
 //
 | L0Elam(hag, e) =>
   let
-  val k = fresh_kvar("k")
+  val k = fresh_kdvar("k")
   val bod =
   xcps(e, lam(e) =<cloref1> 
   c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e)))
@@ -473,7 +473,7 @@ case e of
   end
 | L0Efix(fid, hag, e) =>
   let
-  val k = fresh_kvar("k")
+  val k = fresh_kdvar("k")
   val bod =
   xcps(e, lam(e) =<cloref1> 
   c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e)))
@@ -494,7 +494,7 @@ case e of
   case fdcl of
   | LFUNDECL(fdcl) =>
     let
-    val k = fresh_kvar("k")
+    val k = fresh_kdvar("k")
     val def = 
     case fdcl.def of
     | Some(def) =>
@@ -511,16 +511,18 @@ case e of
     })
     end
   }
-| L0Eimp(hdc, hag, bod, e) =>
-  // TODO: arg-less implements
+| L0Eimp_fun(hdc, hag, bod, e) =>
   let
-  val k = fresh_kvar("k")
+  val k = fresh_kdvar("k")
   val bod =
   xcps(bod, lam(bod) =<cloref1> 
   c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), bod)))
   in
-  c0exp_make_node(C0Eimp(hdc, hag, k, bod, xcps(e, c)))
+  c0exp_make_node(C0Eimp_fun(hdc, hag, k, bod, xcps(e, c)))
   end
+| L0Eimp_val(hdc, bod, e) =>
+  xcps(bod, lam(bod) =<cloref1>
+  c0exp_make_node(C0Eimp_val(hdc, bod, xcps(e, c))))
 | L0Elet_val(ldcl, e) =>
   xcps(ldcl, lam(ldcl) =<cloref1> 
   c0exp_make_node(C0Elet_val(ldcl, xcps(e, c))))
@@ -700,7 +702,7 @@ implement
 xcps_lfundecl(fdcl, c) =
 let
 val LFUNDECL(fdcl) = fdcl
-val k = fresh_kvar("k")
+val k = fresh_kdvar("k")
 val e = 
 case fdcl.def of
 | Some(e) =>
@@ -786,7 +788,7 @@ xcps_l0clau(clau, c) =
 case clau of
 | L0CLAUpat(gpat) =>
   let
-  val k = fresh_kvar("k")
+  val k = fresh_kdvar("k")
   val bod = 
   c0exp_make_node(C0Eret
   (c0nt_make_node(C0VAR(k)), c0val_make_node(C0Vnone0())))
@@ -796,7 +798,7 @@ case clau of
   end
 | L0CLAUexp(gpat, bod) =>
   let
-  val k = fresh_kvar("k")
+  val k = fresh_kdvar("k")
   val bod = 
   xcps(bod, lam(e) =<cloref1>
   c0exp_make_node(C0Eret(c0nt_make_node(C0VAR(k)), e)))
@@ -935,8 +937,10 @@ case e.node() of
   C0Eprimop(fresh(p), fresh(vs), fresh(ks))
 | C0Efun(fdcl, e) =>
   C0Efun(fresh(fdcl), fresh(e))
-| C0Eimp(nam, hag, k, bod, e) =>
-  C0Eimp(nam, hag, k, fresh(bod), fresh(e))
+| C0Eimp_fun(nam, hag, k, bod, e) =>
+  C0Eimp_fun(nam, hag, k, fresh(bod), fresh(e))
+| C0Eimp_val(nam, bod, e) =>
+  C0Eimp_val(nam, fresh(bod), fresh(e))
 | C0Elet_val(ldcl, e) =>
   C0Elet_val(fresh(ldcl), fresh(e))
 | C0Elet_var(ldcl, e) =>

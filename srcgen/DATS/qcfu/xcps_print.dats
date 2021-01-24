@@ -30,7 +30,7 @@ fprint_val<hdvar> = fprint_hdvar
 (* ****** ****** *)
 
 implement
-fprint_val<kvar> = fprint_kvar
+fprint_val<kdvar> = fprint_kdvar
 
 implement
 fprint_val<c0val> = fprint_c0val
@@ -65,18 +65,18 @@ fprint_val<c0gua> = fprint_c0gua
 (* ****** ****** *)
   
 implement 
-print_kvar(v) =
+print_kdvar(v) =
 fprint!(stdout_ref, v)
 
 implement
-prerr_kvar(v) =
+prerr_kdvar(v) =
 fprint!(stderr_ref, v)
 
 implement
-fprint_kvar(fp, v) =
+fprint_kdvar(fp, v) =
 let
-val s = tostring_kvar(v)
-val n = tostamp_kvar(v)
+val s = tostring_kdvar(v)
+val n = tostamp_kdvar(v)
 in
 fprint!(fp, s, "(", n, ")")
 end
@@ -170,9 +170,12 @@ case node of
 //
 | C0Efun(fdcl, e) =>
   fprint!(fp, "C0Efun([", fdcl, "], ", e, ")")
-| C0Eimp(hdc, hag, k, bod, e) =>
+//
+| C0Eimp_fun(hdc, hag, k, bod, e) =>
   fprint!(fp, 
-  "C0Eimp(", hdc, ", [", hag, "], ", k, ", ", bod, ", ", e, ")")
+  "C0Eimp_fun(", hdc, ", [", hag, "], ", k, ", ", bod, ", ", e, ")")
+| C0Eimp_val(hdc, bod, e) =>
+  fprint!(fp, "C0Eimp_val(", hdc, ", ", bod, ", ", e, ")")
 //
 | C0Elet_val(ldcl, e) =>
   fprint!(fp, "C0Elet_val([", ldcl, "], ", e, ")")

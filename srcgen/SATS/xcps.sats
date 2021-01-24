@@ -21,23 +21,23 @@ fun fresh_hdvar(string): hdvar
 
 (* ****** ****** *)
 
-abstbox kvar_tbox = ptr
-typedef kvar = kvar_tbox
+abstbox kdvar_tbox = ptr
+typedef kdvar = kdvar_tbox
 
-fun fresh_kvar(string): kvar
-fun tostring_kvar(kvar): string
-fun tostamp_kvar(kvar): int
+fun fresh_kdvar(string): kdvar
+fun tostring_kdvar(kdvar): string
+fun tostamp_kdvar(kdvar): int
 
-fun eq_kvar(kvar, kvar): bool
-overload = with eq_kvar
+fun eq_kdvar(kdvar, kdvar): bool
+overload = with eq_kdvar
 
-fun print_kvar(kvar): void
-fun prerr_kvar(kvar): void
-fun fprint_kvar(FILEref, kvar): void
+fun print_kdvar(kdvar): void
+fun prerr_kdvar(kdvar): void
+fun fprint_kdvar(FILEref, kdvar): void
 
-overload print with print_kvar
-overload prerr with prerr_kvar
-overload fprint with fprint_kvar
+overload print with print_kdvar
+overload prerr with prerr_kdvar
+overload fprint with fprint_kdvar
 
 (* ****** ****** *)
 
@@ -206,13 +206,13 @@ datatype c0val_node =
 //
 | C0Vlam of // lambda
 ( hfarglst(*arg*)
-, kvar(*cont*)
+, kdvar(*cont*)
 , c0exp(*body*))
 //
 | C0Vfix of // recursive lambda
 ( hdvar(*fid*)
 , hfarglst(*arg*)
-, kvar(*cont*)
+, kdvar(*cont*)
 , c0exp(*body*))
 //
 | C0Vnone0 of ()
@@ -246,11 +246,16 @@ datatype c0exp_node =
 ( cfundeclst
 , c0exp )
 //
-| C0Eimp of
+| C0Eimp_fun of
 ( hdcst(*nam*)
 , hfarglst(*arg*)
-, kvar(*cont*)
+, kdvar(*cont*)
 , c0exp(*bod*)
+, c0exp(*scope*) )
+//
+| C0Eimp_val of
+( hdcst(*nam*)
+, c0val(*bod*)
 , c0exp(*scope*) )
 //
 | C0Elet_val of
@@ -289,7 +294,7 @@ overload .label with c0exp_get_label
 
 datatype c0nt_node =
 | C0HALT of ()
-| C0VAR of (kvar)
+| C0VAR of (kdvar)
 //
 | C0NT of // continuation
 ( hdvar(*arg*)
@@ -309,7 +314,7 @@ CFUNDECL of @{
   nam= hdvar
 , hdc= hdcst 
 , hag= hfarglstopt  
-, knt= kvar
+, knt= kdvar
 , def= c0expopt
 }
 
@@ -392,7 +397,7 @@ overload .label with c0primop_get_label
 datatype c0clau_node = 
 | C0CLAU of // c0clau lambda
 ( c0gpat(*arg*)
-, kvar(*cont*)
+, kdvar(*cont*)
 , c0exp(*body*))
 
 fun c0clau_make_node(c0clau_node): c0clau

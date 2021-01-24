@@ -148,7 +148,9 @@ case node of
   let
   val body = xlambda(body)
   in
-  L0Elam(arg, body)
+  case arg of
+  | list_nil() => body
+  | _ => L0Elam(arg, body)
   end
 | H0Efix(t, fid, arg, body) =>
   let
@@ -349,7 +351,9 @@ case node of
   let
   val exp = xlambda(exp)
   in
-  L0Eimp(hdc, hag, exp,  e)
+  case hag of
+  | list_nil() => L0Eimp_val(hdc, exp,  e)
+  | _ => L0Eimp_fun(hdc, hag, exp,  e)
   end
 //
 | H0Cnone1(_) => e
