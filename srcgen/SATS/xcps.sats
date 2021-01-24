@@ -246,23 +246,16 @@ datatype c0exp_node =
 ( cfundeclst
 , c0exp )
 //
-| C0Eimp_fun of
-( hdcst(*nam*)
-, hfarglst(*arg*)
-, kdvar(*cont*)
-, c0exp(*bod*)
-, c0exp(*scope*) )
-//
-| C0Eimp_val of
+| C0Eimp of
 ( hdcst(*nam*)
 , c0val(*bod*)
 , c0exp(*scope*) )
 //
-| C0Elet_val of
+| C0Eval of
 ( cvaldeclst
 , c0exp )
 //
-| C0Elet_var of
+| C0Evar of
 ( cvardeclst
 , c0exp )
 //
@@ -311,11 +304,8 @@ overload .label with c0nt_get_label
  
 datatype cfundecl_node = 
 CFUNDECL of @{ 
-  nam= hdvar
-, hdc= hdcst 
-, hag= hfarglstopt
-, knt= kdvar
-, def= c0expopt
+  hdc= hdcst
+, def= c0val
 }
 
 fun cfundecl_make_node(cfundecl_node): cfundecl 
@@ -439,7 +429,6 @@ typedef c0val_cont = c0val -<cloref1> c0exp
 typedef c0valst_cont = c0valst -<cloref1> c0exp
 typedef c0valopt_cont = c0valopt -<cloref1> c0exp
 
-typedef cfundecl_cont = cfundecl -<cloref1> c0exp
 typedef cfundeclst_cont = cfundeclst -<cloref1> c0exp
 
 typedef cvaldecl_cont = cvaldecl -<cloref1> c0exp
@@ -468,10 +457,7 @@ overload xcps with xcps_l0expopt
 
 (* ****** ****** *)
 
-fun xcps_lfundecl(lfundecl, cfundecl_cont): c0exp
 fun xcps_lfundeclst(lfundeclst, cfundeclst_cont): c0exp
-
-overload xcps with xcps_lfundecl
 overload xcps with xcps_lfundeclst
 
 (* ****** ****** *)

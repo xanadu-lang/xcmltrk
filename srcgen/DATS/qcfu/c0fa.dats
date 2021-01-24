@@ -25,7 +25,7 @@ val node = e.node()
 val label = e.label()
 in
 case node of
-| C0Eret(k, v) =>
+| C0Eret(k, v) => // continuation call
   let
   val K = c0fa_c0nt(k, env)
   val V = c0fa_c0val(v, env)
@@ -33,7 +33,7 @@ case node of
   c0fa_ret(K, V, env)
   end
 //
-| C0Edapp(f, vs, k) =>
+| C0Edapp(f, vs, k) => // function call
   let
   val F = c0fa_c0val(f, env)
   val VS = 
@@ -50,7 +50,7 @@ case node of
   cache.extend(label, F)
   end
 //
-| C0Efun(fdcl, e) =>
+| C0Efun(fdcl, e) => // no call
   let
   val env = list_foldleft<c0env><cfundecl>(fdcl, env)
   in
@@ -58,30 +58,41 @@ case node of
   end
   where
   {
-  implement 
+  implement
   list_foldleft$fopr<c0env><cfundecl>(env, fdcl) =
   let
-  val node = fdcl.node()
   val label = fdcl.label()
-  val CFUNDECL(fdcl) = node
+  val CFUNDECL(fdcl) = fdcl.node()
+  val V = c0fa_c0val(fdcl.def, env)
+  val env = @{
+    hdv= env.hdv
+  , hdc= env.hdc.extend(fdcl.hdc, V)
+  , kvr= env.kvr
+  }
   in
-  case (fdcl.hag, fdcl.def)  of
-  | (Some(hag), Some(def)) => 
-    let 
-    val f = E0fun(fdcl.nam, fdcl.hdc, hag, fdcl.knt, def)
-    val F = set_sing<V>(V_make_node(f, label))
-    val env = @{
-      hdv= env.hdv
-    , hdc= env.hdc.extend(fdcl.hdc, F)
+  case fdcl.def.node() of
+  | C0Vfix(fid, hag, k, e) => @{
+      hdv= env.hdv.extend(fid, V) 
+    , hdc= env.hdc
     , kvr= env.kvr
     }
-    in 
-    env
-    end
-  | (Some(hag), None()) => env
-  | (None(), Some(def)) => _ // TODO
+  | _ => env
   end
   }
+//
+| C0Eimp_fun(hdc, hag, k, bod, e) =>
+  let
+  val F = 
+  set_sing<V>(V_make_node(E0lam(hag, k, bod), label))
+  val env = @{
+    hdv= env.hdv
+  , hdc= env.hdc.extend(hdc, F)
+  , kvr= env.kvr
+  }
+  in
+  c0fa(e, env)
+  end
+| C0Eimp_val(hdc, v, e) => _
 end
 
 (* ****** ****** *)
@@ -202,17 +213,6 @@ case node of
   val env = c0env_hfarglst(env, hag, VS)
   val env = @{
     hdv= env.hdv
-  , hdc= env.hdc
-  , kvr= env.kvr.extend(k, K)
-  }
-  in
-  c0fa(e, env)
-  end
-| E0fun(fid, hdc, hag, k, e) =>
-  let 
-  val env = c0env_hfarglst(env, hag, VS)
-  val env = @{
-    hdv= env.hdv.extend(fid, set_sing<V>(f))
   , hdc= env.hdc
   , kvr= env.kvr.extend(k, K)
   }

@@ -61,10 +61,9 @@ l0exp =
 | L0Elam of (hfarglst, l0exp)
 | L0Efix of (hdvar, hfarglst, l0exp)
 | L0Efun of (lfundeclst, l0exp)
-| L0Eimp_fun of (hdcst, hfarglst, l0exp, l0exp)
-| L0Eimp_val of (hdcst, l0exp, l0exp)
-| L0Elet_val of (lvaldeclst, l0exp)
-| L0Elet_var of (lvardeclst, l0exp) 
+| L0Eimp of (hdcst, l0exp, l0exp)
+| L0Eval of (lvaldeclst, l0exp)
+| L0Evar of (lvardeclst, l0exp) 
 //
 | L0Etry0 of (token, l0exp, l0claulst) // NOTE: primop
 //

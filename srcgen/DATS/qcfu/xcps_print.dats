@@ -171,15 +171,12 @@ case node of
 | C0Efun(fdcl, e) =>
   fprint!(fp, "C0Efun([", fdcl, "], ", e, ")")
 //
-| C0Eimp_fun(hdc, hag, k, bod, e) =>
-  fprint!(fp, 
-  "C0Eimp_fun(", hdc, ", [", hag, "], ", k, ", ", bod, ", ", e, ")")
-| C0Eimp_val(hdc, bod, e) =>
-  fprint!(fp, "C0Eimp_val(", hdc, ", ", bod, ", ", e, ")")
+| C0Eimp(hdc, bod, e) =>
+  fprint!(fp, "C0Eimp(", hdc, ", ", bod, ", ", e, ")")
 //
-| C0Elet_val(ldcl, e) =>
+| C0Eval(ldcl, e) =>
   fprint!(fp, "C0Elet_val([", ldcl, "], ", e, ")")
-| C0Elet_var(ldcl, e) =>
+| C0Evar(ldcl, e) =>
   fprint!(fp, "C0Elet_var([", ldcl, "], ", e, ")")
 //
 | C0Eif0(v, k1, k2) =>
@@ -231,22 +228,11 @@ let
 val node = fdcl.node()
 val CFUNDECL(fdcl) = node
 in
-case fdcl.hag of
-| Some(hag) =>
-  fprint!
-  ( fp
-  , "CFUNDECL@{" 
-  , "nam=", fdcl.nam, ", "
-  , "hag=", hag, ", "
-  , "knt=", fdcl.knt, ", "
-  , "def=", fdcl.def, "}")
-| None() =>
-  fprint!
-  ( fp
-  , "CFUNDECL@{" 
-  , "nam=", fdcl.nam, ", "
-  , "knt=", fdcl.knt, ", "
-  , "def=", fdcl.def, "}")
+fprint!
+( fp
+, "CFUNDECL@{" 
+, "hdc=", fdcl.hdc, ", "
+, "def=", fdcl.def, "}")
 end
 
 (* ****** ****** *)

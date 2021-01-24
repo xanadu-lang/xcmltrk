@@ -75,7 +75,6 @@ datatype V_node = // user nodes
 | E0lam of (hfarglst, kdvar, c0exp)
 | E0fix of (hdvar, hfarglst, kdvar, c0exp)
 | E0imp of (hdcst, hfarglst, kdvar, c0exp)
-| E0fun of (hdvar, hdcst, hfarglst, kdvar, c0exp)
 
 fun K_make_node(K_node, int(*label*)): K
 fun V_make_node(V_node, int(*label*)): V

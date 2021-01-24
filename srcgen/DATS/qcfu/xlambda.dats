@@ -312,7 +312,7 @@ case node of
   val vd =
   list_vt2t(list_map<hvaldecl><lvaldecl>(vd))
   in
-  L0Elet_val(vd, e)
+  L0Eval(vd, e)
   end
   where
   {
@@ -330,7 +330,7 @@ case node of
   val vd = 
   list_vt2t(list_map<hvardecl><lvardecl>(vd))
   in
-  L0Elet_var(vd, e)
+  L0Evar(vd, e)
   end
   where
   {
@@ -352,8 +352,8 @@ case node of
   val exp = xlambda(exp)
   in
   case hag of
-  | list_nil() => L0Eimp_val(hdc, exp,  e)
-  | _ => L0Eimp_fun(hdc, hag, exp,  e)
+  | list_nil() => L0Eimp(hdc, exp,  e)
+  | _ => L0Eimp(hdc, L0Elam(hag, exp),  e)
   end
 //
 | H0Cnone1(_) => e

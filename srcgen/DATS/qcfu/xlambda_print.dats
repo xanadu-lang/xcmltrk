@@ -142,14 +142,12 @@ case e of
   fprint!(fp, "L0Efix(", v, ", [", hag, "], ", e, ")")
 | L0Efun(fdcl, e) =>
   fprint!(fp, "L0Efun([", fdcl, "], ", e, ")")
-| L0Eimp_fun(hdc, hag, bod, e) =>
-  fprint!(fp, "L0Eimp_fun(", hdc, ", [", hag, "], ", bod, ", ", e, ")")
-| L0Eimp_val(hdc, bod, e) =>
-  fprint!(fp, "L0Eimp_val(", hdc, ", ", bod, ", ", e, ")")
-| L0Elet_val(ldcl, e) =>
-  fprint!(fp, "L0Elet_val([", ldcl, "], ", e, ")")
-| L0Elet_var(ldcl, e) =>
-  fprint!(fp, "L0Elet_var([", ldcl, "], ", e, ")")
+| L0Eimp(hdc, bod, e) =>
+  fprint!(fp, "L0Eimp(", hdc, ", ", bod, ", ", e, ")")
+| L0Eval(ldcl, e) =>
+  fprint!(fp, "L0Eval([", ldcl, "], ", e, ")")
+| L0Evar(ldcl, e) =>
+  fprint!(fp, "L0Evar([", ldcl, "], ", e, ")")
 //
 | L0Etry0(t, e, clau) =>
   fprint!(fp, "L0Etry0(", t, ", ", e, ", ", clau, ")")
