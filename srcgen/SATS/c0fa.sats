@@ -99,14 +99,22 @@ typedef c0env = @{
 , kvr= env(kdvar, K)
 }
 
-fun c0env_hfarglst(c0env, hfarglst, setlst(V)): c0env
+(* ****** ****** *)
+
+fun c0env_hfarg(hfarg, set(V), c0env): c0env
+fun c0env_hfarglst(hfarglst, setlst(V), c0env): c0env
+
+fun c0env_h0pat(h0pat, set(V), c0env): c0env
+fun c0env_h0patlst(h0patlst, setlst(V), c0env): c0env
+
+(* ****** ****** *)
+
+fun c0fa_c0val(c0val, c0env): set(V)
+fun c0fa_c0nt(c0nt, c0env): set(K)
 
 (* ****** ****** *)
 
 fun c0fa(c0exp, c0env): cache(V)
-
-fun c0fa_c0val(c0val, c0env): set(V)
-fun c0fa_c0nt(c0nt, c0env): set(K)
 
 fun 
 c0fa_ret // continuation application
@@ -121,6 +129,13 @@ c0fa_dapp
 , setlst(V) // argument set
 , set(K) // continuation set
 , c0env // environment set
+): cache(V)
+
+fun
+c0fa_clau
+( set(V)
+, c0clau 
+, set(K)
 ): cache(V)
  
 (* fun c0fa_C0Eprimop(c0primop, c0setlst, c0set, c0venv): c0cache *)

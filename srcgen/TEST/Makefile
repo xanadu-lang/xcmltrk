@@ -14,6 +14,7 @@ all:: \
 test-2021-01-05 \
 test-2021-01-22 \
 test-2021-01-23 \
+test-2021-01-24 \
 ######
 testall:: all
 testall:: cleanall
@@ -29,6 +30,10 @@ $(XCMLTRK) \
 test-2021-01-23: ; \
 $(XCMLTRK) \
 -d test-2021-01-23.dats > test-2021-01-23.log \
+######
+test-2021-01-24: ; \
+$(XCMLTRK) \
+-d test-2021-01-24.dats > test-2021-01-24.log \
 ######
 clean:: ; $(RMF) *~
 ######

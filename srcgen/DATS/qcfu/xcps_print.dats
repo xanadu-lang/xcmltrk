@@ -175,9 +175,9 @@ case node of
   fprint!(fp, "C0Eimp(", hdc, ", ", bod, ", ", e, ")")
 //
 | C0Eval(ldcl, e) =>
-  fprint!(fp, "C0Elet_val([", ldcl, "], ", e, ")")
+  fprint!(fp, "C0Eval([", ldcl, "], ", e, ")")
 | C0Evar(ldcl, e) =>
-  fprint!(fp, "C0Elet_var([", ldcl, "], ", e, ")")
+  fprint!(fp, "C0Evar([", ldcl, "], ", e, ")")
 //
 | C0Eif0(v, k1, k2) =>
   fprint!(fp, "C0Eif0(", v, ", ", k1, ", ", k2, ")")

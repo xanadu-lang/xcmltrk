@@ -50,6 +50,8 @@ case node of
   cache.extend(label, F)
   end
 //
+| C0Eprimop(p, vs, k) => _ // TODO: needs work
+//
 | C0Efun(fdcl, e) => // no call
   let
   val env = list_foldleft<c0env><cfundecl>(fdcl, env)
@@ -80,19 +82,112 @@ case node of
   end
   }
 //
-| C0Eimp_fun(hdc, hag, k, bod, e) =>
+| C0Eimp(hdc, v, e) =>
   let
-  val F = 
-  set_sing<V>(V_make_node(E0lam(hag, k, bod), label))
+  val V = c0fa_c0val(v, env)
   val env = @{
     hdv= env.hdv
-  , hdc= env.hdc.extend(hdc, F)
+  , hdc= env.hdc.extend(hdc, V)
   , kvr= env.kvr
   }
   in
   c0fa(e, env)
   end
-| C0Eimp_val(hdc, v, e) => _
+//
+| C0Eval(ldcl, e) =>
+  let
+  val env = list_foldleft<c0env><cvaldecl>(ldcl, env)
+  in
+  c0fa(e, env) 
+  end
+  where
+  {
+  implement
+  list_foldleft$fopr<c0env><cvaldecl>(env, ldcl) =
+  let
+  val CVALDECL(ldcl) = ldcl.node()
+  in
+  case ldcl.def of
+  | Some(def) =>
+    let
+    val V = c0fa_c0val(def, env)
+    in
+    c0env_h0pat(ldcl.pat, V, env)
+    end
+  | None() => env
+  end
+  }
+//
+| C0Evar(ldcl, e) =>
+  let
+  val env = list_foldleft<c0env><cvardecl>(ldcl, env)
+  in
+  c0fa(e, env)
+  end
+  where
+  {
+  implement
+  list_foldleft$fopr<c0env><cvardecl>(env, ldcl) =
+  let
+  val CVARDECL(ldcl) = ldcl.node()
+  in
+  case ldcl.ini of
+  | Some(ini) =>
+    let
+    val V = c0fa_c0val(ini, env)
+    val env = @{
+      hdv= env.hdv.extend(ldcl.hdv, V)
+    , hdc= env.hdc 
+    , kvr= env.kvr
+    }
+    in
+    env
+    end
+  | None() => env
+  end
+  }
+//
+| C0Eif0(v, k1, k2) =>
+  let
+  val V = c0fa_c0val(v, env)
+  val K1 = c0fa_c0nt(k1, env)
+  val K2 = c0fa_c0nt(k2, env)
+  val cache1 = c0fa_ret(K1, V, env)
+  val cache2 = c0fa_ret(K2, V, env)
+  in
+  union(cache1, cache2)
+  end
+//
+| C0Ecase(_, v, clau, k) =>
+  let
+  val V = c0fa_c0val(v, env)
+  val K = c0fa_c0nt(k, env)
+  val cache = 
+  list_foldleft<cache(V)><c0clau>(clau, cache_empty<V>())
+  where
+  {
+  implement
+  list_foldleft$fopr<cache(V)><c0clau>(cache, clau) =
+  union(cache, c0fa_clau(V, clau, K))
+  }
+  in
+  cache
+  end
+| C0Etry0(_, v, clau, k) =>
+  let
+  val V = c0fa_c0val(v, env)
+  val K = c0fa_c0nt(k, env)
+  val cache = 
+  list_foldleft<cache(V)><c0clau>(clau, cache_empty<V>())
+  where
+  {
+  implement
+  list_foldleft$fopr<cache(V)><c0clau>(cache, clau) =
+  union(cache, c0fa_clau(V, clau, K))
+  }
+  in
+  cache
+  end
 end
 
 (* ****** ****** *)
@@ -188,18 +283,19 @@ case node of
   end
 | E0lam(hag, k, e) =>
   let
-  val env = c0env_hfarglst(env, hag, VS)
+  val env = c0env_hfarglst(hag, VS, env)
   val env = @{
-    hdv= env.hdv
-  , hdc= env.hdc
-  , kvr= env.kvr.extend(k, K)
-  }
+      hdv= env.hdv
+    , hdc= env.hdc
+    , kvr= env.kvr.extend(k, K)
+    }
   in
   c0fa(e, env)
   end
+//
 | E0fix(fid, hag,  k, e) =>
   let
-  val env = c0env_hfarglst(env, hag, VS)
+  val env = c0env_hfarglst(hag, VS, env)
   val env = @{
     hdv= env.hdv.extend(fid, set_sing<V>(f))
   , hdc= env.hdc
@@ -210,7 +306,7 @@ case node of
   end
 | E0imp(hdc, hag, k, e) =>
   let
-  val env = c0env_hfarglst(env, hag, VS)
+  val env = c0env_hfarglst(hag, VS, env)
   val env = @{
     hdv= env.hdv
   , hdc= env.hdc
@@ -221,3 +317,24 @@ case node of
   end
 end
 }
+
+(* ****** ****** *)
+
+implement
+c0env_hfarg(hag, V, env) =
+let
+val hag = hag.node()
+in
+set_fold<V><c0env>(V, env)
+where
+{
+implement  
+set_fold$fopr<V><c0env>(v, env) =
+let
+val v = v.node()
+in
+case (v, hag) of
+| (E0con(_,_), HFARGnpats(_,pats)) =>
+end
+}
+end
